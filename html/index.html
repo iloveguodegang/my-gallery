@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule34-lite Gallery</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --bs-dark-rgb: 17, 17, 17;
+            --bs-light-rgb: 250, 250, 250;
+        }
+        
+        body {
+            background-color: #111;
+            color: #fafafa;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9) !important;
+            backdrop-filter: blur(10px);
+        }
+        
+        .sidebar {
+            background-color: #1a1a1a;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+        
+        .category-item {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s;
+        }
+        
+        .category-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .category-item.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        
+        .thumbnail-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            background-color: #1a1a1a;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .thumbnail-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .thumbnail-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .tag-pill {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            margin: 0.25rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tag-pill:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .loader.active {
+            display: block;
+        }
+        
+        #imageModal .modal-content {
+            background-color: #1a1a1a;
+            color: #fafafa;
+        }
+        
+        #imageModal .modal-body img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .error-message {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                top: 0;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-images"></i> Rule34-lite
+            </a>
+            <form class="d-flex" role="search" id="searchForm">
+                <input class="form-control me-2" type="search" placeholder="搜索标签..." aria-label="Search" id="searchInput">
+                <button class="btn btn-outline-light" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid" style="margin-top: 80px;">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2">
+                <div class="sidebar">
+                    <h5 class="mb-3"># 分类</h5>
+                    <div id="categoriesList">
+                        <div class="category-item active" data-category="all">
+                            <i class="bi bi-grid-3x3-gap"></i> 全部 
+                            <span class="badge bg-secondary" id="count-all">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="col-md-9 col-lg-10">
+                <div id="errorContainer"></div>
+                <div class="row g-3" id="galleryGrid">
+                    <!-- 图片将动态加载到这里 -->
+                </div>
+                
+                <!-- Loading Indicator -->
+                <div class="text-center my-4" id="loadingIndicator" style="display: none;">
+                    <div class="spinner-border text-light" role="status">
+                        <span class="visually-hidden">加载中...</span>
+                    </div>
+                </div>
+                
+                <!-- Load More Sentinel -->
+                <div id="loadMoreSentinel" style="height: 1px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Detail Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">图片详情</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <img src="" alt="" class="img-fluid" id="modalImage">
+                        </div>
+                        <div class="col-lg-4">
+                            <h6>标签</h6>
+                            <div id="modalTags"></div>
+                            <hr>
+                            <div id="imageInfo"></div>
+                            <button class="btn btn-primary w-100 mt-3" id="downloadBtn">
+                                <i class="bi bi-download"></i> 下载图片
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top -->
+    <button class="btn btn-secondary position-fixed bottom-0 end-0 m-3" onclick="window.scrollTo(0, 0)" style="z-index: 1000;">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Main App Script -->
+    <script src="config.js"></script>
+    
+    <script>
+        // ===== 配置 =====
+        const SUPABASE_URL = SUPABASE_CONFIG.url;
+        const SUPABASE_ANON_KEY = SUPABASE_CONFIG.anonKey;
+        const PAGE_SIZE = SUPABASE_CONFIG.itemsPerPage;
+        
+        // ===== 全局变量 =====
+        let supabase;
+        let currentOffset = 0;
+        let currentCategory = 'all';
+        let currentQuery = '';
+        let isLoading = false;
+        let hasMore = true;
+        
+        // ===== 工具函数 =====
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+        
+        function clearError() {
+            document.getElementById('errorContainer').innerHTML = '';
+        }
+        
+        function showLoading(show) {
+            const indicator = document.getElementById('loadingIndicator');
+            indicator.style.display = show ? 'block' : 'none';
+        }
+        
+        // ===== 数据加载函数 =====
+        async function loadCategories() {
+            try {
+                // 初始化 Supabase 客户端
+                const { createClient } = window.supabase;
+                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                // 获取所有分类及其数量
+                const { data, error } = await supabase
+                    .from('images')
+                    .select('category');
+                
+                if (error) throw error;
+                
+                // 统计分类数量
+                const categoryCounts = {};
+                let totalCount = 0;
+                
+                data.forEach(item => {
+                    const category = item.category || 'uncategorized';
+                    categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+                    totalCount++;
+                });
+                
+                // 更新"全部"的数量
+                document.getElementById('count-all').textContent = totalCount;
+                
+                const categoriesList = document.getElementById('categoriesList');
+                
+                // 清除除了"全部"之外的分类
+                while (categoriesList.children.length > 1) {
+                    categoriesList.removeChild(categoriesList.lastChild);
+                }
+                
+                // 添加各个分类
+                Object.entries(categoryCounts)
+                    .sort((a, b) => b[1] - a[1]) // 按数量排序
+                    .forEach(([category, count]) => {
+                        const categoryDiv = document.createElement('div');
+                        categoryDiv.className = 'category-item';
+                        categoryDiv.dataset.category = category;
+                        
+                        // 使用配置文件中的图标映射
+                        const icon = SUPABASE_CONFIG.categoryIcons[category] || 'bi-folder';
+                        
+                        categoryDiv.innerHTML = `
+                            <i class="bi ${icon}"></i> ${category} 
+                            <span class="badge bg-secondary">${count}</span>
+                        `;
+                        
+                        categoryDiv.addEventListener('click', () => selectCategory(category));
+                        categoriesList.appendChild(categoryDiv);
+                    });
+                
+            } catch (error) {
+                console.error('加载分类失败:', error);
+                showError('加载分类失败: ' + error.message);
+            }
+        }
+        
+        async function loadImages(reset = false) {
+            if (isLoading || (!hasMore && !reset)) return;
+            
+            isLoading = true;
+            showLoading(true);
+            clearError();
+            
+            try {
+                if (reset) {
+                    currentOffset = 0;
+                    hasMore = true;
+                    document.getElementById('galleryGrid').innerHTML = '';
+                }
+                
+                // 构建查询
+                let query = supabase
+                    .from('images')
+                    .select('*')
+                    .order('uploaded_at', { ascending: false })
+                    .range(currentOffset, currentOffset + PAGE_SIZE - 1);
+                
+                // 添加分类过滤
+                if (currentCategory && currentCategory !== 'all') {
+                    query = query.eq('category', currentCategory);
+                }
+                
+                // 添加标签搜索
+                if (currentQuery) {
+                    query = query.contains('tags', [currentQuery]);
+                }
+                
+                const { data, error } = await query;
+                
+                if (error) throw error;
+                
+                if (data.length < PAGE_SIZE) {
+                    hasMore = false;
+                }
+                
+                // 渲染图片
+                renderImages(data);
+                currentOffset += data.length;
+                
+            } catch (error) {
+                console.error('加载图片失败:', error);
+                showError('加载图片失败: ' + error.message);
+            } finally {
+                isLoading = false;
+                showLoading(false);
+            }
+        }
+        
+        function renderImages(images) {
+            const grid = document.getElementById('galleryGrid');
+            
+            images.forEach(image => {
+                const col = document.createElement('div');
+                col.className = 'col-6 col-sm-4 col-md-3 col-xl-2';
+                
+                // 构建图片URL
+                const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/${image.file_path}`;
+                
+                col.innerHTML = `
+                    <div class="thumbnail-card" data-image-id="${image.id}">
+                        <img src="${imageUrl}" alt="${image.tags ? image.tags.join(', ') : ''}" loading="lazy">
+                    </div>
+                `;
+                
+                col.querySelector('.thumbnail-card').addEventListener('click', () => showImageDetail(image));
+                grid.appendChild(col);
+            });
+        }
+        
+        // ===== 交互函数 =====
+        function selectCategory(category) {
+            currentCategory = category;
+            
+            // 更新UI
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.category === category);
+            });
+            
+            // 重新加载图片
+            loadImages(true);
+        }
+        
+        function showImageDetail(image) {
+            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+            const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/${image.file_path}`;
+            
+            // 设置图片
+            document.getElementById('modalImage').src = imageUrl;
+            
+            // 设置标签
+            const tagsContainer = document.getElementById('modalTags');
+            tagsContainer.innerHTML = '';
+            
+            if (image.tags && image.tags.length > 0) {
+                image.tags.forEach(tag => {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = 'tag-pill';
+                    tagEl.textContent = tag;
+                    tagEl.addEventListener('click', () => {
+                        modal.hide();
+                        searchByTag(tag);
+                    });
+                    tagsContainer.appendChild(tagEl);
+                });
+            }
+            
+            // 设置图片信息
+            const infoContainer = document.getElementById('imageInfo');
+            infoContainer.innerHTML = `
+                <p><strong>分类:</strong> ${image.category}</p>
+                <p><strong>上传时间:</strong> ${new Date(image.uploaded_at).toLocaleString('zh-CN')}</p>
+            `;
+            
+            // 设置下载按钮
+            document.getElementById('downloadBtn').onclick = () => {
+                const a = document.createElement('a');
+                a.href = imageUrl;
+                a.download = `image_${image.id}.jpg`;
+                a.click();
+            };
+            
+            modal.show();
+        }
+        
+        function searchByTag(tag) {
+            currentQuery = tag;
+            document.getElementById('searchInput').value = tag;
+            loadImages(true);
+        }
+        
+        // ===== 事件监听 =====
+        document.getElementById('searchForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            currentQuery = document.getElementById('searchInput').value.trim();
+            loadImages(true);
+        });
+        
+        // 无限滚动
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !isLoading && hasMore) {
+                loadImages();
+            }
+        }, {
+            rootMargin: '100px'
+        });
+        
+        observer.observe(document.getElementById('loadMoreSentinel'));
+        
+        // ===== 初始化 =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // 检查配置
+            if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
+                showError('Supabase 配置未找到！请检查 config.js 文件。');
+                return;
+            }
+            
+            // 加载初始数据
+            loadCategories();
+            loadImages();
+        });
+    </script>
+</body>
+</html> 

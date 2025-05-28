@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能图片上传助手 - Rule34-lite</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #111;
+            color: #fafafa;
+            padding: 2rem;
+        }
+        
+        .upload-area {
+            border: 2px dashed #6c757d;
+            border-radius: 0.5rem;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+        
+        .file-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .file-item {
+            background-color: #1a1a1a;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress {
+            height: 30px;
+        }
+        
+        .tag-input {
+            background-color: #1a1a1a;
+            border: 1px solid #495057;
+            color: #fff;
+        }
+        
+        .tag-suggestion {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            margin: 0.25rem;
+            background-color: rgba(13, 110, 253, 0.2);
+            border: 1px solid #0d6efd;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .tag-suggestion:hover {
+            background-color: #0d6efd;
+        }
+        
+        .tag-suggestion.selected {
+            background-color: #0d6efd;
+        }
+        
+        .tag-template {
+            background-color: #1a1a1a;
+            border: 1px solid #495057;
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tag-template:hover {
+            border-color: #0d6efd;
+        }
+        
+        .individual-tags {
+            background-color: #2a2a2a;
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .file-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">
+            <i class="bi bi-cloud-upload"></i> 智能图片上传助手
+        </h1>
+        
+        <!-- 配置区域 -->
+        <div class="card bg-dark mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Supabase 配置</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Project URL</label>
+                        <input type="text" class="form-control tag-input" id="supabaseUrl" 
+                               placeholder="https://your-project.supabase.co">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Anon Key</label>
+                        <input type="text" class="form-control tag-input" id="supabaseKey" 
+                               placeholder="eyJhbGc...">
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-3" onclick="testConnection()">
+                    <i class="bi bi-plug"></i> 测试连接
+                </button>
+            </div>
+        </div>
+        
+        <!-- 标签模板区域 -->
+        <div class="card bg-dark mb-4">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-bookmark"></i> 标签模板
+                    <button class="btn btn-sm btn-outline-primary ms-2" onclick="showTemplateModal()">
+                        <i class="bi bi-plus"></i> 新建模板
+                    </button>
+                </h5>
+                <div id="tagTemplates">
+                    <!-- 预设模板 -->
+                    <div class="tag-template" onclick="applyTemplate('anime_girl')">
+                        <strong>动漫女孩</strong>
+                        <div class="text-muted small">anime, girl, cute, kawaii</div>
+                    </div>
+                    <div class="tag-template" onclick="applyTemplate('western_art')">
+                        <strong>西方艺术</strong>
+                        <div class="text-muted small">western, art, realistic, detailed</div>
+                    </div>
+                    <div class="tag-template" onclick="applyTemplate('furry_character')">
+                        <strong>兽人角色</strong>
+                        <div class="text-muted small">furry, anthropomorphic, character</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 上传区域 -->
+        <div class="card bg-dark mb-4">
+            <div class="card-body">
+                <h5 class="card-title">选择图片</h5>
+                <div class="upload-area" id="uploadArea">
+                    <i class="bi bi-cloud-arrow-up" style="font-size: 3rem;"></i>
+                    <p class="mt-3 mb-0">拖拽图片到这里，或点击选择文件</p>
+                    <small class="text-muted">支持 JPG, PNG, GIF, WebP 格式</small>
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                </div>
+                
+                <!-- 批量设置 -->
+                <div class="row g-3 mt-3">
+                    <div class="col-md-3">
+                        <label class="form-label">默认分类</label>
+                        <select class="form-select tag-input" id="defaultCategory">
+                            <option value="anime">anime</option>
+                            <option value="western">western</option>
+                            <option value="furry">furry</option>
+                        </select>
+                    </div>
+                    <div class="col-md-9">
+                        <label class="form-label">批量标签</label>
+                        <input type="text" class="form-control tag-input" id="batchTags" 
+                               placeholder="输入标签，用逗号分隔">
+                        <div class="mt-2">
+                            <small class="text-muted">智能建议：</small>
+                            <div id="tagSuggestions"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 文件列表 -->
+        <div class="card bg-dark mb-4" id="fileListCard" style="display: none;">
+            <div class="card-body">
+                <h5 class="card-title">
+                    待上传文件
+                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="toggleIndividualEdit()">
+                        <i class="bi bi-pencil"></i> 单独编辑
+                    </button>
+                </h5>
+                <div class="file-list" id="fileList"></div>
+                <button class="btn btn-success mt-3" onclick="startUpload()">
+                    <i class="bi bi-upload"></i> 开始上传
+                </button>
+                <button class="btn btn-secondary mt-3 ms-2" onclick="clearFiles()">
+                    <i class="bi bi-trash"></i> 清空列表
+                </button>
+            </div>
+        </div>
+        
+        <!-- 上传进度 -->
+        <div class="card bg-dark" id="progressCard" style="display: none;">
+            <div class="card-body">
+                <h5 class="card-title">上传进度</h5>
+                <div class="progress mb-3">
+                    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%">0%</div>
+                </div>
+                <div id="uploadStatus"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 标签模板创建模态框 -->
+    <div class="modal fade" id="templateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title">创建标签模板</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">模板名称</label>
+                        <input type="text" class="form-control tag-input" id="templateName" placeholder="例如：动漫女孩">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">标签列表</label>
+                        <input type="text" class="form-control tag-input" id="templateTags" placeholder="用逗号分隔标签">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTemplate()">保存模板</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    
+    <script>
+        let supabase = null;
+        let filesToUpload = [];
+        let individualEditMode = false;
+        
+        // 预设标签建议
+        const tagSuggestions = {
+            anime: ['girl', 'boy', 'cute', 'kawaii', 'school_uniform', 'long_hair', 'short_hair', 'blonde', 'brunette'],
+            western: ['realistic', 'art', 'portrait', 'landscape', 'detailed', 'painting', 'digital_art'],
+            furry: ['anthropomorphic', 'character', 'wolf', 'cat', 'fox', 'dragon', 'cute', 'fluffy'],
+            common: ['solo', 'smile', 'looking_at_viewer', 'outdoors', 'indoors', 'day', 'night']
+        };
+        
+        // 标签模板
+        const tagTemplates = {
+            anime_girl: ['anime', 'girl', 'cute', 'kawaii'],
+            western_art: ['western', 'art', 'realistic', 'detailed'],
+            furry_character: ['furry', 'anthropomorphic', 'character']
+        };
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedConfig();
+            setupUploadArea();
+            updateTagSuggestions();
+            loadCustomTemplates();
+            
+            // 自动填入配置
+            if (SUPABASE_CONFIG && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+                document.getElementById('supabaseUrl').value = SUPABASE_CONFIG.url;
+                document.getElementById('supabaseKey').value = SUPABASE_CONFIG.anonKey;
+                
+                // 自动测试连接
+                testConnection();
+            }
+        });
+        
+        function loadSavedConfig() {
+            const savedUrl = localStorage.getItem('supabaseUrl');
+            const savedKey = localStorage.getItem('supabaseKey');
+            if (savedUrl) document.getElementById('supabaseUrl').value = savedUrl;
+            if (savedKey) document.getElementById('supabaseKey').value = savedKey;
+        }
+        
+        function setupUploadArea() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            
+            uploadArea.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFiles);
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles({ target: { files: e.dataTransfer.files } });
+            });
+            
+            // 分类变化时更新标签建议
+            document.getElementById('defaultCategory').addEventListener('change', updateTagSuggestions);
+        }
+        
+        function updateTagSuggestions() {
+            const category = document.getElementById('defaultCategory').value;
+            const suggestionsContainer = document.getElementById('tagSuggestions');
+            
+            const suggestions = [...tagSuggestions[category], ...tagSuggestions.common];
+            
+            suggestionsContainer.innerHTML = suggestions.map(tag => 
+                `<span class="tag-suggestion" onclick="addSuggestedTag('${tag}')">${tag}</span>`
+            ).join('');
+        }
+        
+        function addSuggestedTag(tag) {
+            const batchTagsInput = document.getElementById('batchTags');
+            const currentTags = batchTagsInput.value.split(',').map(t => t.trim()).filter(t => t);
+            
+            if (!currentTags.includes(tag)) {
+                currentTags.push(tag);
+                batchTagsInput.value = currentTags.join(', ');
+            }
+            
+            // 高亮已选择的标签
+            event.target.classList.add('selected');
+        }
+        
+        function applyTemplate(templateKey) {
+            const tags = tagTemplates[templateKey];
+            if (tags) {
+                document.getElementById('batchTags').value = tags.join(', ');
+                updateTagSuggestions();
+            }
+        }
+        
+        function showTemplateModal() {
+            const modal = new bootstrap.Modal(document.getElementById('templateModal'));
+            modal.show();
+        }
+        
+        function saveTemplate() {
+            const name = document.getElementById('templateName').value.trim();
+            const tags = document.getElementById('templateTags').value.trim();
+            
+            if (!name || !tags) {
+                alert('请填写模板名称和标签');
+                return;
+            }
+            
+            const templateKey = name.toLowerCase().replace(/\s+/g, '_');
+            tagTemplates[templateKey] = tags.split(',').map(t => t.trim());
+            
+            // 保存到 localStorage
+            localStorage.setItem('customTagTemplates', JSON.stringify(tagTemplates));
+            
+            // 添加到界面
+            const templatesContainer = document.getElementById('tagTemplates');
+            const templateDiv = document.createElement('div');
+            templateDiv.className = 'tag-template';
+            templateDiv.onclick = () => applyTemplate(templateKey);
+            templateDiv.innerHTML = `
+                <strong>${name}</strong>
+                <div class="text-muted small">${tags}</div>
+            `;
+            templatesContainer.appendChild(templateDiv);
+            
+            // 关闭模态框
+            bootstrap.Modal.getInstance(document.getElementById('templateModal')).hide();
+            
+            // 清空表单
+            document.getElementById('templateName').value = '';
+            document.getElementById('templateTags').value = '';
+        }
+        
+        function loadCustomTemplates() {
+            const saved = localStorage.getItem('customTagTemplates');
+            if (saved) {
+                const customTemplates = JSON.parse(saved);
+                Object.assign(tagTemplates, customTemplates);
+            }
+        }
+        
+        async function testConnection() {
+            const url = document.getElementById('supabaseUrl').value;
+            const key = document.getElementById('supabaseKey').value;
+            
+            if (!url || !key) {
+                alert('请填写 Supabase URL 和 Key');
+                return;
+            }
+            
+            try {
+                const { createClient } = window.supabase;
+                supabase = createClient(url, key);
+                
+                const { data, error } = await supabase
+                    .from('images')
+                    .select('count', { count: 'exact', head: true });
+                
+                if (error) throw error;
+                
+                localStorage.setItem('supabaseUrl', url);
+                localStorage.setItem('supabaseKey', key);
+                
+                alert('连接成功！');
+            } catch (error) {
+                alert('连接失败：' + error.message);
+            }
+        }
+        
+        function handleFiles(e) {
+            const files = Array.from(e.target.files);
+            const imageFiles = files.filter(file => file.type.startsWith('image/'));
+            
+            imageFiles.forEach(file => {
+                // 为每个文件创建预览URL
+                file.previewUrl = URL.createObjectURL(file);
+                // 初始化个人标签
+                file.individualTags = '';
+            });
+            
+            filesToUpload = [...filesToUpload, ...imageFiles];
+            displayFiles();
+        }
+        
+        function displayFiles() {
+            const fileList = document.getElementById('fileList');
+            const fileListCard = document.getElementById('fileListCard');
+            
+            if (filesToUpload.length === 0) {
+                fileListCard.style.display = 'none';
+                return;
+            }
+            
+            fileListCard.style.display = 'block';
+            fileList.innerHTML = '';
+            
+            filesToUpload.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                fileItem.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <img src="${file.previewUrl}" alt="预览" class="file-preview me-3">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${file.name}</strong>
+                                    <small class="text-muted ms-2">(${(file.size / 1024 / 1024).toFixed(2)} MB)</small>
+                                </div>
+                                <button class="btn btn-sm btn-danger" onclick="removeFile(${index})">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                            ${individualEditMode ? `
+                                <div class="individual-tags">
+                                    <label class="form-label small">个人标签：</label>
+                                    <input type="text" class="form-control form-control-sm tag-input" 
+                                           value="${file.individualTags}" 
+                                           onchange="updateIndividualTags(${index}, this.value)"
+                                           placeholder="为此图片添加特定标签">
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                fileList.appendChild(fileItem);
+            });
+        }
+        
+        function toggleIndividualEdit() {
+            individualEditMode = !individualEditMode;
+            displayFiles();
+        }
+        
+        function updateIndividualTags(index, tags) {
+            filesToUpload[index].individualTags = tags;
+        }
+        
+        function removeFile(index) {
+            // 释放预览URL
+            URL.revokeObjectURL(filesToUpload[index].previewUrl);
+            filesToUpload.splice(index, 1);
+            displayFiles();
+        }
+        
+        function clearFiles() {
+            // 释放所有预览URL
+            filesToUpload.forEach(file => URL.revokeObjectURL(file.previewUrl));
+            filesToUpload = [];
+            displayFiles();
+            document.getElementById('fileInput').value = '';
+        }
+        
+        async function startUpload() {
+            if (!supabase) {
+                alert('请先测试 Supabase 连接');
+                return;
+            }
+            
+            if (filesToUpload.length === 0) {
+                alert('请选择要上传的文件');
+                return;
+            }
+            
+            const progressCard = document.getElementById('progressCard');
+            const progressBar = document.getElementById('progressBar');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const defaultCategory = document.getElementById('defaultCategory').value;
+            const batchTags = document.getElementById('batchTags').value
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag);
+            
+            progressCard.style.display = 'block';
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (let i = 0; i < filesToUpload.length; i++) {
+                const file = filesToUpload[i];
+                const progress = ((i + 1) / filesToUpload.length * 100).toFixed(0);
+                
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '%';
+                
+                uploadStatus.innerHTML = `
+                    <p>正在上传: ${file.name}</p>
+                    <p>进度: ${i + 1} / ${filesToUpload.length}</p>
+                    <p class="text-success">成功: ${successCount}</p>
+                    <p class="text-danger">失败: ${errorCount}</p>
+                `;
+                
+                try {
+                    const timestamp = Date.now();
+                    const ext = file.name.split('.').pop();
+                    const fileName = `${timestamp}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
+                    
+                    // 上传到存储桶
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('public')
+                        .upload(fileName, file);
+                    
+                    if (uploadError) throw uploadError;
+                    
+                    // 合并批量标签和个人标签
+                    const individualTags = file.individualTags
+                        .split(',')
+                        .map(tag => tag.trim())
+                        .filter(tag => tag);
+                    
+                    const finalTags = [...new Set([...batchTags, ...individualTags])];
+                    
+                    // 插入数据库记录
+                    const { error: dbError } = await supabase
+                        .from('images')
+                        .insert({
+                            file_path: `public/${fileName}`,
+                            category: defaultCategory,
+                            tags: finalTags
+                        });
+                    
+                    if (dbError) throw dbError;
+                    
+                    successCount++;
+                } catch (error) {
+                    console.error('上传失败:', error);
+                    errorCount++;
+                }
+            }
+            
+            uploadStatus.innerHTML = `
+                <div class="alert alert-success">
+                    <h6>上传完成！</h6>
+                    <p>成功: ${successCount} 个文件</p>
+                    <p>失败: ${errorCount} 个文件</p>
+                </div>
+            `;
+            
+            setTimeout(clearFiles, 2000);
+        }
+    </script>
+</body>
+</html> 
