@@ -198,421 +198,290 @@
         }
         
         .navbar-brand:hover {
-            color: var(--secondary-color) !important;
+            color: var(--accent-color) !important;
         }
         
+        /* 搜索框 */
         .search-container {
             position: relative;
-            max-width: 400px;
-            width: 100%;
+            flex: 1;
+            max-width: 600px;
+            margin: 0 2rem;
         }
         
-        .search-input {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 25px;
-            color: var(--text-primary);
-            padding: 0.75rem 1rem 0.75rem 3rem;
+        .search-box {
             width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            color: var(--text-primary);
+            padding: 0.75rem 3rem 0.75rem 1.5rem;
+            font-size: 1rem;
+            outline: none;
             transition: var(--transition);
         }
         
-        .search-input::placeholder {
-            color: var(--text-muted);
-        }
-        
-        .search-input:focus {
-            outline: none;
+        .search-box:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
-            background: var(--bg-secondary);
         }
         
-        .search-icon {
+        .search-btn {
             position: absolute;
-            left: 1rem;
+            right: 8px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
-            pointer-events: none;
-        }
-        
-        .user-menu {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
             display: flex;
             align-items: center;
-            gap: 1rem;
-        }
-        
-        .btn-login {
-            background: transparent;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            text-decoration: none;
+            justify-content: center;
+            cursor: pointer;
             transition: var(--transition);
-            font-weight: 500;
         }
         
-        .btn-login:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-1px);
+        .search-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-50%) scale(1.05);
         }
         
         /* 主要内容区域 */
         .main-content {
-            margin-top: 100px;
-            padding: 0;
+            margin-top: 80px;
+            transition: var(--transition);
         }
         
-        /* 侧边栏过滤器 */
-        .filters-sidebar {
+        .container-fluid {
+            padding: 0 1rem;
+        }
+        
+        /* 标签区域 */
+        .tags-section {
             background: var(--bg-secondary);
-            padding: 1rem;
-            height: calc(100vh - 100px);
-            overflow-y: auto;
-            border-right: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
             box-shadow: var(--shadow-light);
         }
         
-        .filter-section {
-            margin-bottom: 1.5rem;
+        .tags-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 1rem;
+            gap: 1rem;
         }
         
-        .filter-title {
-            font-size: 0.9rem;
+        .tags-title {
+            font-size: 1.1rem;
             font-weight: 600;
-            margin-bottom: 0.75rem;
-            color: var(--text-primary);
+            color: var(--primary-color);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
         
-        .hot-tags-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.4rem;
-            margin-bottom: 0.75rem;
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
         
         .tag-item {
             background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--border-radius);
-            font-size: 0.8rem;
-            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            text-decoration: none;
             transition: var(--transition);
-            text-align: left;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            border: 1px solid var(--border-color);
+            position: relative;
+            cursor: pointer;
         }
         
         .tag-item:hover {
             background: var(--primary-color);
-            border-color: var(--primary-color);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+            box-shadow: var(--shadow-light);
         }
         
         .tag-item.active {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-color: var(--primary-color);
+            background: var(--primary-color);
             color: white;
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-        }
-        
-        .show-more-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 0.6rem 1rem;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: var(--transition);
-            width: 100%;
-            font-size: 0.85rem;
-        }
-        
-        .show-more-btn:hover {
             border-color: var(--primary-color);
-            color: var(--primary-color);
-            background: rgba(76, 175, 80, 0.05);
+        }
+        
+        .tag-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 0.3rem;
+        }
+        
+        /* 过滤器 */
+        .filters-section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
         }
         
         .filter-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.5rem;
         }
         
-        .filter-group h6 {
+        .filter-label {
             font-size: 0.9rem;
-            font-weight: 600;
             color: var(--text-secondary);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.3rem;
         }
         
-        .filter-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        
-        .filter-option {
+        .filter-select {
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: var(--transition);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 0.5rem;
+            width: 100%;
         }
         
-        .filter-option:hover,
-        .filter-option.active {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            color: white;
-            transform: translateY(-1px);
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
         }
         
         /* 图片网格 */
-        .gallery-container {
-            padding: 1.5rem;
-            height: calc(100vh - 100px);
-            overflow-y: auto;
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            padding: 0;
         }
         
-        .masonry-grid {
-            column-count: 2;
-            column-gap: 1rem;
-            column-fill: balance;
-        }
-        
-        @media (min-width: 576px) {
-            .masonry-grid { column-count: 3; }
-        }
-        
-        @media (min-width: 768px) {
-            .masonry-grid { column-count: 4; }
-        }
-        
-        @media (min-width: 992px) {
-            .masonry-grid { column-count: 5; }
-        }
-        
-        @media (min-width: 1200px) {
-            .masonry-grid { column-count: 6; }
-        }
-        
-        @media (min-width: 1400px) {
-            .masonry-grid { column-count: 7; }
-        }
-        
-        /* 图片卡片 */
-        .image-card {
+        .gallery-item {
             background: var(--bg-secondary);
             border-radius: var(--border-radius);
             overflow: hidden;
-            margin-bottom: 1rem;
-            break-inside: avoid;
-            cursor: pointer;
             transition: var(--transition);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
             position: relative;
-            border: 2px solid transparent;
         }
         
-        .image-card:hover {
-            border-color: var(--primary-color);
+        .gallery-item:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-heavy);
+            border-color: var(--primary-color);
         }
         
-        .image-card img {
+        .gallery-item img {
             width: 100%;
-            height: auto;
-            display: block;
+            height: 200px;
+            object-fit: cover;
             transition: var(--transition);
         }
         
-        .image-card:hover img {
-            transform: scale(1.02);
+        .gallery-item:hover img {
+            transform: scale(1.05);
         }
         
-        .image-love {
-            position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
+        .gallery-item-info {
+            padding: 0.75rem;
+        }
+        
+        .gallery-item-tags {
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             gap: 0.25rem;
+            margin-top: 0.5rem;
         }
         
-        /* 图片详情模态框 */
-        .image-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(20px);
-            z-index: 2500;
-            display: none;
-            opacity: 0;
-            transition: var(--transition);
+        .gallery-item-tag {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            padding: 0.15rem 0.4rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
         }
         
-        .image-modal.show {
-            display: flex;
-            opacity: 1;
+        /* 模态框 */
+        .modal {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .modal-dialog {
+            max-width: 90vw;
+            max-height: 90vh;
+            margin: 2rem auto;
         }
         
         .modal-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            max-width: 1400px;
-            margin: auto;
             background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
             overflow: hidden;
-            box-shadow: var(--shadow-heavy);
-            transform: scale(0.9);
-            transition: var(--transition);
-        }
-        
-        .image-modal.show .modal-content {
-            transform: scale(1);
         }
         
         .modal-header {
-            background: var(--bg-secondary);
-            padding: 1rem 1.5rem;
+            background: var(--bg-tertiary);
             border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            padding: 1rem 1.5rem;
         }
         
-        .modal-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .action-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.5rem 1rem;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-        
-        .action-btn:hover {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-            color: white;
-            transform: translateY(-1px);
-        }
-        
-        .action-btn.loved {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            color: white;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 0.5rem;
-            border-radius: 50%;
-        }
-        
-        .modal-close:hover {
-            color: var(--text-primary);
-            background: var(--bg-tertiary);
+        .modal-title {
+            color: var(--primary-color);
+            font-weight: 600;
         }
         
         .modal-body {
-            flex: 1;
+            padding: 0;
             display: flex;
-            position: relative;
-        }
-        
-        .modal-image-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-primary);
-            padding: 2rem;
+            max-height: 70vh;
         }
         
         .modal-image {
+            flex: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            position: relative;
+        }
+        
+        .modal-image img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            border-radius: var(--border-radius);
-        }
-        
-        .modal-sidebar {
-            width: 400px;
-            background: var(--bg-secondary);
-            border-left: 1px solid var(--border-color);
-            overflow-y: auto;
         }
         
         .modal-info {
+            flex: 1;
             padding: 1.5rem;
-        }
-        
-        .modal-section {
-            margin-bottom: 1.5rem;
-        }
-        
-        .modal-section h6 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 0.75rem;
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            min-width: 300px;
         }
         
         .modal-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+            margin-top: 1rem;
         }
         
         .modal-tag {
+            display: inline-block;
             background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.4rem 0.8rem;
-            border-radius: 16px;
+            color: var(--text-secondary);
+            padding: 0.3rem 0.6rem;
+            margin: 0.2rem;
+            border-radius: 15px;
             font-size: 0.8rem;
             cursor: pointer;
             transition: var(--transition);
@@ -620,71 +489,27 @@
         
         .modal-tag:hover {
             background: var(--primary-color);
-            border-color: var(--primary-color);
             color: white;
-            transform: translateY(-1px);
-        }
-        
-        .modal-meta {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            line-height: 1.6;
-        }
-        
-        .meta-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-        
-        .suggested-posts {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border-color);
-        }
-        
-        .suggested-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-        }
-        
-        .suggested-item {
-            aspect-ratio: 1;
-            background: var(--bg-tertiary);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .suggested-item:hover {
-            transform: scale(1.05);
-        }
-        
-        .suggested-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
         }
         
         /* 加载动画 */
-        .loading-container {
+        .loading {
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            padding: 4rem 2rem;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2rem;
             color: var(--text-secondary);
         }
         
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
+        .spinner {
             border: 3px solid var(--border-color);
             border-top: 3px solid var(--primary-color);
             border-radius: 50%;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
+            margin-right: 1rem;
         }
         
         @keyframes spin {
@@ -692,398 +517,312 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* 错误消息 */
-        .error-message {
-            background: rgba(244, 67, 54, 0.1);
-            border: 1px solid rgba(244, 67, 54, 0.3);
-            color: #f44336;
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            margin: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
         /* 响应式设计 */
         @media (max-width: 768px) {
-            .main-content {
-                margin-top: 80px;
-            }
-            
-            .navbar {
-                padding: 0.75rem 0;
-            }
-            
             .search-container {
-                max-width: 200px;
+                margin: 0 1rem;
             }
             
-            .filters-sidebar {
-                display: none;
-            }
-            
-            .gallery-container {
-                padding: 1rem;
-                height: calc(100vh - 80px);
-            }
-            
-            .masonry-grid {
-                column-count: 2;
-                column-gap: 0.5rem;
-            }
-            
-            .modal-content {
-                margin: 1rem;
-                border-radius: var(--border-radius);
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 0.75rem;
             }
             
             .modal-body {
                 flex-direction: column;
             }
             
-            .modal-sidebar {
-                width: 100%;
-                max-height: 40vh;
-                border-left: none;
-                border-top: 1px solid var(--border-color);
+            .modal-info {
+                min-width: auto;
             }
             
-            .modal-image-container {
+            .tags-section {
                 padding: 1rem;
             }
-            
-            .user-menu {
+        }
+        
+        @media (max-width: 480px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
                 gap: 0.5rem;
             }
             
-            .btn-login {
-                padding: 0.4rem 1rem;
-                font-size: 0.85rem;
-            }
-            
-            .hot-tags-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        
-        /* Mobile filters */
-        .mobile-filters {
-            display: none;
-            background: var(--bg-secondary);
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        @media (max-width: 768px) {
-            .mobile-filters {
-                display: block;
-            }
-            
-            .mobile-filters .hot-tags-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            }
-        }
-        
-        /* 动画效果 */
-        .fade-in {
-            animation: fadeIn 0.6s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .gallery-item img {
+                height: 150px;
             }
         }
     </style>
 </head>
 <body>
     <!-- 侧边栏菜单 -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <div class="sidebar-menu" id="sidebarMenu">
         <div class="sidebar-header">
-            <div class="sidebar-title">Rule34 中文站</div>
+            <div class="sidebar-title">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                菜单
+            </div>
             <button class="sidebar-close" onclick="toggleSidebar()">
                 <i class="bi bi-x"></i>
             </button>
         </div>
+        
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item active">
+            <a href="#" class="nav-item active" onclick="loadAllImages()">
                 <i class="bi bi-house"></i>
                 <span>首页</span>
             </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-star"></i>
-                <span>精品内容</span>
+            
+            <a href="../rule34-station.html" class="nav-item">
+                <i class="bi bi-cloud-arrow-up"></i>
+                <span>中转站</span>
             </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-fire"></i>
-                <span>热门</span>
+            
+            <a href="../tag-manager.html" class="nav-item">
+                <i class="bi bi-tags"></i>
+                <span>标签管理</span>
             </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-list-ul"></i>
-                <span>播放列表</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-chat-dots"></i>
-                <span>评论</span>
-            </a>
+            
             <div class="nav-divider"></div>
-            <a href="#" class="nav-item">
-                <i class="bi bi-gem"></i>
-                <span>账户升级</span>
+            
+            <a href="#" class="nav-item" onclick="filterByRating('s')">
+                <i class="bi bi-shield-check"></i>
+                <span>安全内容</span>
             </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-download"></i>
-                <span>安装应用</span>
+            
+            <a href="#" class="nav-item" onclick="filterByRating('q')">
+                <i class="bi bi-exclamation-triangle"></i>
+                <span>可疑内容</span>
             </a>
-            <div class="nav-divider"></div>
-            <a href="#" class="nav-item">
-                <i class="bi bi-box-arrow-in-right"></i>
-                <span>登录</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-person-plus"></i>
-                <span>注册</span>
+            
+            <a href="#" class="nav-item" onclick="filterByRating('e')">
+                <i class="bi bi-exclamation-circle"></i>
+                <span>明确内容</span>
             </a>
         </nav>
     </div>
-
+    
+    <!-- 侧边栏覆盖层 -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
     <!-- 顶部导航栏 -->
-    <nav class="navbar">
+    <nav class="navbar" id="navbar">
         <div class="container-fluid">
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center w-100">
                 <button class="menu-toggle" onclick="toggleSidebar()">
                     <i class="bi bi-list"></i>
                 </button>
+                
                 <a class="navbar-brand" href="#">
+                    <i class="bi bi-image"></i>
                     Rule34 中文站
                 </a>
-            </div>
-            
-            <div class="search-container">
-                <form id="searchForm">
-                    <div class="position-relative">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="text" class="search-input" id="searchInput" placeholder="搜索 Search" autocomplete="off">
-                    </div>
-                </form>
-            </div>
-            
-            <div class="user-menu">
-                <a href="#" class="btn-login">登录</a>
+                
+                <!-- 搜索框 -->
+                <div class="search-container">
+                    <input type="text" class="search-box" id="searchInput" 
+                           placeholder="搜索标签、艺术家、角色...">
+                    <button class="search-btn" onclick="performSearch()">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-success" onclick="clearFilters()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        重置
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
-
+    
     <!-- 主要内容 -->
-    <div class="main-content">
-        <!-- 移动端过滤器 -->
-        <div class="mobile-filters">
-            <div class="hot-tags-grid" id="mobileHotTags">
-                <!-- 移动端热门标签 -->
-            </div>
-        </div>
-        
-        <div class="container-fluid p-0">
-            <div class="row g-0">
-                <!-- 侧边栏过滤器 -->
-                <div class="col-md-3 col-lg-2">
-                    <div class="filters-sidebar">
-                        <!-- 热门标签 -->
-                        <div class="filter-section">
-                            <div class="filter-title">
-                                <i class="bi bi-tags"></i>
+    <main class="main-content">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- 标签区域 -->
+                <div class="col-12">
+                    <div class="tags-section">
+                        <div class="tags-header">
+                            <div class="tags-title">
+                                <i class="bi bi-tags-fill"></i>
                                 热门标签
                             </div>
-                            <div class="hot-tags-grid" id="hotTagsGrid">
-                                <!-- 热门标签将动态加载 -->
-                            </div>
-                            <button class="show-more-btn" id="showMoreTags">
-                                显示更多 (+10)
-                            </button>
                         </div>
-
-                        <!-- 过滤器和设置 -->
-                        <div class="filter-section">
-                            <div class="filter-title">
-                                <i class="bi bi-funnel"></i>
-                                过滤器和设置
-                            </div>
-                            
-                            <div class="filter-group">
-                                <h6>媒体类型</h6>
-                                <div class="filter-options">
-                                    <div class="filter-option active" data-type="all">全部</div>
-                                    <div class="filter-option" data-type="images">图像</div>
-                                    <div class="filter-option" data-type="videos">视频</div>
-                                </div>
-                            </div>
-                            
-                            <div class="filter-group">
-                                <h6>排序</h6>
-                                <div class="filter-options">
-                                    <div class="filter-option active" data-sort="latest">最新的</div>
-                                    <div class="filter-option" data-sort="top">最高评分</div>
-                                    <div class="filter-option" data-sort="viewed">最多观看</div>
-                                </div>
-                            </div>
+                        <div class="tags-container" id="hotTagsContainer">
+                            <!-- 热门标签将动态加载 -->
                         </div>
                     </div>
-                </div>
-
-                <!-- 图片网格 -->
-                <div class="col-md-9 col-lg-10">
-                    <div class="gallery-container">
-                        <div id="errorContainer"></div>
-                        
-                        <div class="masonry-grid" id="galleryGrid">
-                            <!-- 图片将动态加载到这里 -->
-                        </div>
-                        
-                        <!-- 加载指示器 -->
-                        <div class="loading-container" id="loadingIndicator" style="display: none;">
-                            <div class="loading-spinner"></div>
-                            <span>正在加载精彩内容...</span>
-                        </div>
-                        
-                        <!-- 无限滚动哨兵 -->
-                        <div id="loadMoreSentinel" style="height: 1px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 图片详情模态框 -->
-    <div class="image-modal" id="imageModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-actions">
-                    <button class="action-btn" id="loveBtn">
-                        <i class="bi bi-heart"></i>
-                        <span>2</span>
-                    </button>
-                    <button class="action-btn" id="bookmarkBtn">
-                        <i class="bi bi-bookmark"></i>
-                    </button>
-                    <button class="action-btn" id="playlistBtn">
-                        <i class="bi bi-plus"></i>
-                        添加到播放列表
-                    </button>
-                    <button class="action-btn" id="shareBtn">
-                        <i class="bi bi-share"></i>
-                    </button>
-                    <button class="action-btn" id="moreBtn">
-                        <i class="bi bi-three-dots"></i>
-                    </button>
-                </div>
-                <button class="modal-close" onclick="closeImageModal()">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="modal-image-container">
-                    <img src="" alt="" class="modal-image" id="modalImage">
                 </div>
                 
-                <div class="modal-sidebar">
-                    <div class="modal-info">
-                        <div class="modal-section">
-                            <div class="modal-tags" id="modalTags">
-                                <!-- 标签将动态加载 -->
+                <!-- 过滤器区域 -->
+                <div class="col-12">
+                    <div class="filters-section">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="filter-group">
+                                    <div class="filter-label">排序方式</div>
+                                    <select class="filter-select" id="sortBy" onchange="applyFilters()">
+                                        <option value="newest">最新上传</option>
+                                        <option value="oldest">最早上传</option>
+                                        <option value="score_desc">评分最高</option>
+                                        <option value="score_asc">评分最低</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="filter-group">
+                                    <div class="filter-label">内容评级</div>
+                                    <select class="filter-select" id="ratingFilter" onchange="applyFilters()">
+                                        <option value="">全部评级</option>
+                                        <option value="s">安全 (Safe)</option>
+                                        <option value="q">可疑 (Questionable)</option>
+                                        <option value="e">明确 (Explicit)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="filter-group">
+                                    <div class="filter-label">当前过滤</div>
+                                    <div id="currentFilters" class="text-muted" style="padding: 0.5rem;">
+                                        无过滤条件
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="modal-section">
-                            <div class="modal-meta" id="modalMeta">
-                                <!-- 图片信息将动态加载 -->
-                            </div>
-                        </div>
+                    </div>
+                </div>
+                
+                <!-- 图片画廊 -->
+                <div class="col-12">
+                    <div class="gallery" id="gallery">
+                        <!-- 图片将动态加载 -->
                     </div>
                     
-                    <div class="suggested-posts">
-                        <h6>推荐内容</h6>
-                        <div class="suggested-grid" id="suggestedGrid">
-                            <!-- 推荐内容将动态加载 -->
+                    <!-- 加载更多按钮 -->
+                    <div class="text-center mt-4">
+                        <button class="btn btn-outline-success btn-lg" id="loadMoreBtn" onclick="loadMoreImages()">
+                            <i class="bi bi-arrow-down-circle"></i>
+                            加载更多
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 图片详情模态框 -->
+    <div class="modal fade" id="imageModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalTitle">图片详情</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-image">
+                        <img id="modalImage" src="" alt="">
+                    </div>
+                    <div class="modal-info">
+                        <div class="mb-3">
+                            <h6 class="text-success mb-2">基本信息</h6>
+                            <div class="text-muted small" id="imageInfo">
+                                <!-- 图片信息 -->
+                            </div>
+                        </div>
+                        
+                        <div class="modal-tags">
+                            <h6 class="text-success mb-2">标签</h6>
+                            <div id="modalTagsContainer">
+                                <!-- 标签 -->
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success" onclick="likeImage()">
+                                    <i class="bi bi-heart"></i>
+                                    喜欢
+                                </button>
+                                <button class="btn btn-outline-success" onclick="downloadImage()">
+                                    <i class="bi bi-download"></i>
+                                    下载
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Scripts -->
+    
+    <!-- 加载遮罩 -->
+    <div class="loading" id="loadingMask" style="display: none;">
+        <div class="spinner"></div>
+        正在加载...
+    </div>
+    
+    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
     
     <script>
-        // ===== 配置 =====
-        const SUPABASE_URL = SUPABASE_CONFIG.url;
-        const SUPABASE_ANON_KEY = SUPABASE_CONFIG.anonKey;
-        const PAGE_SIZE = SUPABASE_CONFIG.itemsPerPage;
+        // Supabase配置
+        const SUPABASE_URL = 'https://ibehtwiqwopghgeblflg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliZWh0d2lxd29wZ2hnZWJsZmxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDM1NzYsImV4cCI6MjA2Mzk3OTU3Nn0.yQaK5fo25uU_sDWAnMQilGAsoX4v4uY2eemt5SVg5tI';
         
-        // ===== 全局变量 =====
-        let supabase;
-        let currentOffset = 0;
-        let currentQuery = '';
-        let isLoading = false;
-        let hasMore = true;
-        let allTags = [];
+        // 初始化Supabase客户端
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // 全局变量
+        let images = [];
         let hotTags = [];
-        let visibleTagsCount = 10;
+        let currentFilters = {
+            search: '',
+            tags: [],
+            rating: '',
+            sortBy: 'newest'
+        };
+        let currentPage = 0;
+        const pageSize = 20;
+        let isLoading = false;
+        let hasMoreImages = true;
         
-        // ===== 侧边栏控制 =====
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebarMenu');
-            const overlay = document.getElementById('sidebarOverlay');
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHotTags();
+            loadImages();
             
-            sidebar.classList.toggle('show');
-            overlay.classList.toggle('show');
-        }
+            // 搜索框回车事件
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // 滚动时导航栏效果
+            window.addEventListener('scroll', function() {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
+            // ESC键关闭侧边栏
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeSidebar();
+                }
+            });
+        });
         
-        // ===== 工具函数 =====
-        function showError(message) {
-            const errorContainer = document.getElementById('errorContainer');
-            errorContainer.innerHTML = `
-                <div class="error-message fade-in">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    ${message}
-                </div>
-            `;
-        }
-        
-        function clearError() {
-            document.getElementById('errorContainer').innerHTML = '';
-        }
-        
-        function showLoading(show) {
-            const indicator = document.getElementById('loadingIndicator');
-            indicator.style.display = show ? 'block' : 'none';
-        }
-        
-        function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + 'M';
-            } else if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
-            }
-            return num.toString();
-        }
-        
-        // ===== 标签相关函数 =====
+        // 加载热门标签
         async function loadHotTags() {
             try {
-                const { createClient } = window.supabase;
-                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                
                 const { data, error } = await supabase
                     .from('images')
                     .select('tags');
@@ -1092,21 +831,20 @@
                 
                 // 统计标签频率
                 const tagCounts = {};
-                data.forEach(item => {
-                    if (item.tags && Array.isArray(item.tags)) {
-                        item.tags.forEach(tag => {
+                data.forEach(image => {
+                    if (image.tags && Array.isArray(image.tags)) {
+                        image.tags.forEach(tag => {
                             tagCounts[tag] = (tagCounts[tag] || 0) + 1;
                         });
                     }
                 });
                 
                 // 排序并获取热门标签
-                allTags = Object.entries(tagCounts)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([tag, count]) => ({ tag, count }));
+                const sortedTags = Object.entries(tagCounts)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 50); // 取前50个热门标签
                 
-                hotTags = allTags.slice(0, 50); // 取前50个热门标签
-                
+                hotTags = sortedTags;
                 renderHotTags();
                 
             } catch (error) {
@@ -1114,258 +852,288 @@
             }
         }
         
+        // 渲染热门标签
         function renderHotTags() {
-            const grid = document.getElementById('hotTagsGrid');
-            const mobileGrid = document.getElementById('mobileHotTags');
+            const container = document.getElementById('hotTagsContainer');
+            container.innerHTML = '';
             
-            // 显示的标签数量
-            const tagsToShow = hotTags.slice(0, visibleTagsCount);
-            
-            const tagsHtml = tagsToShow.map(({ tag, count }) => 
-                `<div class="tag-item" data-tag="${tag}" onclick="searchByTag('${tag}')">${tag}</div>`
-            ).join('');
-            
-            grid.innerHTML = tagsHtml;
-            
-            // 移动端显示前8个
-            const mobileTagsHtml = hotTags.slice(0, 8).map(({ tag }) => 
-                `<div class="tag-item" data-tag="${tag}" onclick="searchByTag('${tag}')">${tag}</div>`
-            ).join('');
-            mobileGrid.innerHTML = mobileTagsHtml;
-            
-            // 更新显示更多按钮
-            const showMoreBtn = document.getElementById('showMoreTags');
-            const remainingCount = hotTags.length - visibleTagsCount;
-            if (remainingCount > 0) {
-                showMoreBtn.textContent = `显示更多 (+${Math.min(remainingCount, 10)})`;
-                showMoreBtn.style.display = 'block';
-            } else {
-                showMoreBtn.style.display = 'none';
-            }
+            hotTags.slice(0, 30).forEach(([tag, count]) => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag-item';
+                tagElement.innerHTML = `
+                    ${tag}
+                    <span class="tag-count">${count}</span>
+                `;
+                tagElement.onclick = () => filterByTag(tag);
+                container.appendChild(tagElement);
+            });
         }
         
-        // ===== 数据加载函数 =====
+        // 加载图片
         async function loadImages(reset = false) {
-            if (isLoading || (!hasMore && !reset)) return;
+            if (isLoading) return;
+            if (!hasMoreImages && !reset) return;
             
             isLoading = true;
-            showLoading(true);
-            clearError();
+            
+            if (reset) {
+                currentPage = 0;
+                images = [];
+                hasMoreImages = true;
+                document.getElementById('gallery').innerHTML = '';
+            }
+            
+            showLoading();
             
             try {
-                if (reset) {
-                    currentOffset = 0;
-                    hasMore = true;
-                    document.getElementById('galleryGrid').innerHTML = '';
-                }
-                
                 let query = supabase
                     .from('images')
-                    .select('*')
-                    .order('uploaded_at', { ascending: false })
-                    .range(currentOffset, currentOffset + PAGE_SIZE - 1);
+                    .select('*');
                 
-                if (currentQuery) {
-                    query = query.contains('tags', [currentQuery]);
+                // 应用过滤器
+                if (currentFilters.search) {
+                    query = query.textSearch('tags', currentFilters.search);
                 }
+                
+                if (currentFilters.rating) {
+                    query = query.eq('rating', currentFilters.rating);
+                }
+                
+                // 排序
+                switch (currentFilters.sortBy) {
+                    case 'newest':
+                        query = query.order('uploaded_at', { ascending: false });
+                        break;
+                    case 'oldest':
+                        query = query.order('uploaded_at', { ascending: true });
+                        break;
+                    case 'score_desc':
+                        query = query.order('score', { ascending: false });
+                        break;
+                    case 'score_asc':
+                        query = query.order('score', { ascending: true });
+                        break;
+                }
+                
+                // 分页
+                const from = currentPage * pageSize;
+                const to = from + pageSize - 1;
+                query = query.range(from, to);
                 
                 const { data, error } = await query;
                 
                 if (error) throw error;
                 
-                if (data.length < PAGE_SIZE) {
-                    hasMore = false;
+                if (data.length < pageSize) {
+                    hasMoreImages = false;
+                    document.getElementById('loadMoreBtn').style.display = 'none';
+                } else {
+                    document.getElementById('loadMoreBtn').style.display = 'block';
+                }
+                
+                if (reset) {
+                    images = data;
+                } else {
+                    images = images.concat(data);
                 }
                 
                 renderImages(data);
-                currentOffset += data.length;
+                currentPage++;
                 
             } catch (error) {
                 console.error('加载图片失败:', error);
-                showError('加载图片失败: ' + error.message);
+                alert('加载图片失败: ' + error.message);
             } finally {
+                hideLoading();
                 isLoading = false;
-                showLoading(false);
             }
         }
         
-        function renderImages(images) {
-            const grid = document.getElementById('galleryGrid');
+        // 渲染图片
+        function renderImages(imageData) {
+            const gallery = document.getElementById('gallery');
             
-            images.forEach((image, index) => {
-                const imageCard = document.createElement('div');
-                imageCard.className = 'image-card fade-in';
-                imageCard.style.animationDelay = `${index * 0.1}s`;
-                imageCard.dataset.imageId = image.id;
+            imageData.forEach(image => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                galleryItem.onclick = () => showImageDetails(image);
                 
                 const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/${image.file_path}`;
-                const loveCount = Math.floor(Math.random() * 10) + 1;
                 
-                imageCard.innerHTML = `
-                    <img src="${imageUrl}" alt="${image.tags ? image.tags.join(', ') : ''}" loading="lazy">
-                    <div class="image-love">
-                        <i class="bi bi-heart"></i>
-                        ${loveCount}
+                galleryItem.innerHTML = `
+                    <img src="${imageUrl}" alt="图片" loading="lazy">
+                    <div class="gallery-item-info">
+                        <div class="text-muted small">
+                            评分: ${image.score || 0} | 评级: ${image.rating || 'N/A'}
+                        </div>
+                        <div class="gallery-item-tags">
+                            ${(image.tags || []).slice(0, 5).map(tag => 
+                                `<span class="gallery-item-tag">${tag}</span>`
+                            ).join('')}
+                        </div>
                     </div>
                 `;
                 
-                imageCard.addEventListener('click', () => showImageDetail(image));
-                grid.appendChild(imageCard);
+                gallery.appendChild(galleryItem);
             });
         }
         
-        // ===== 交互函数 =====
-        function searchByTag(tag) {
-            currentQuery = tag;
-            document.getElementById('searchInput').value = tag;
-            
-            // 更新活跃标签状态
-            document.querySelectorAll('.tag-item').forEach(item => {
-                item.classList.toggle('active', item.dataset.tag === tag);
-            });
-            
-            loadImages(true);
-        }
-        
-        function clearSearch() {
-            currentQuery = '';
-            document.getElementById('searchInput').value = '';
-            document.querySelectorAll('.tag-item.active').forEach(item => {
-                item.classList.remove('active');
-            });
-            loadImages(true);
-        }
-        
-        function showImageDetail(image) {
-            const modal = document.getElementById('imageModal');
+        // 显示图片详情
+        function showImageDetails(image) {
+            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
             const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/${image.file_path}`;
             
+            document.getElementById('imageModalTitle').textContent = `图片 ID: ${image.id}`;
             document.getElementById('modalImage').src = imageUrl;
             
-            // 设置标签
-            const tagsContainer = document.getElementById('modalTags');
-            if (image.tags && image.tags.length > 0) {
-                const tagsHtml = image.tags.map(tag => 
-                    `<div class="modal-tag" onclick="closeImageModal(); searchByTag('${tag}');">${tag}</div>`
-                ).join('');
-                tagsContainer.innerHTML = tagsHtml;
-            } else {
-                tagsContainer.innerHTML = '<span class="text-muted">暂无标签</span>';
-            }
-            
-            // 设置元信息
-            const metaContainer = document.getElementById('modalMeta');
-            metaContainer.innerHTML = `
-                <div class="meta-item">
-                    <span>发布时间</span>
-                    <span>${new Date(image.uploaded_at).toLocaleDateString('zh-CN')}</span>
-                </div>
-                <div class="meta-item">
-                    <span>分类</span>
-                    <span>${image.category}</span>
-                </div>
+            // 显示图片信息
+            document.getElementById('imageInfo').innerHTML = `
+                <div>上传时间: ${new Date(image.uploaded_at).toLocaleString()}</div>
+                <div>尺寸: ${image.width || '未知'} × ${image.height || '未知'}</div>
+                <div>评分: ${image.score || 0}</div>
+                <div>评级: ${image.rating || 'N/A'}</div>
+                <div>文件大小: ${image.file_size ? formatFileSize(image.file_size) : '未知'}</div>
             `;
             
-            // 生成推荐内容（模拟）
-            generateSuggestedContent();
+            // 显示标签
+            const tagsContainer = document.getElementById('modalTagsContainer');
+            tagsContainer.innerHTML = '';
             
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closeImageModal() {
-            const modal = document.getElementById('imageModal');
-            modal.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-        
-        function generateSuggestedContent() {
-            const suggestedGrid = document.getElementById('suggestedGrid');
-            const placeholders = Array.from({length: 6}, (_, i) => {
-                const randomColor = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'][i];
-                return `
-                    <div class="suggested-item" style="background: ${randomColor};">
-                    </div>
-                `;
-            }).join('');
-            
-            suggestedGrid.innerHTML = placeholders;
-        }
-        
-        // ===== 事件监听 =====
-        document.getElementById('searchForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const query = document.getElementById('searchInput').value.trim();
-            if (query) {
-                searchByTag(query);
-            } else {
-                clearSearch();
-            }
-        });
-        
-        // 显示更多标签
-        document.getElementById('showMoreTags').addEventListener('click', () => {
-            visibleTagsCount += 10;
-            renderHotTags();
-        });
-        
-        // 过滤器选项
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('filter-option')) {
-                const group = e.target.parentElement;
-                group.querySelectorAll('.filter-option').forEach(opt => opt.classList.remove('active'));
-                e.target.classList.add('active');
-            }
-        });
-        
-        // 模态框操作按钮
-        document.getElementById('loveBtn').addEventListener('click', function() {
-            this.classList.toggle('loved');
-            const count = parseInt(this.querySelector('span').textContent);
-            this.querySelector('span').textContent = this.classList.contains('loved') ? count + 1 : count - 1;
-        });
-        
-        // 点击模态框背景关闭
-        document.getElementById('imageModal').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) {
-                closeImageModal();
-            }
-        });
-        
-        // ESC键关闭模态框和侧边栏
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeImageModal();
-                const sidebar = document.getElementById('sidebarMenu');
-                const overlay = document.getElementById('sidebarOverlay');
-                if (sidebar.classList.contains('show')) {
-                    sidebar.classList.remove('show');
-                    overlay.classList.remove('show');
-                }
-            }
-        });
-        
-        // 无限滚动
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting && !isLoading && hasMore) {
-                loadImages();
-            }
-        }, {
-            rootMargin: '100px'
-        });
-        
-        observer.observe(document.getElementById('loadMoreSentinel'));
-        
-        // ===== 初始化 =====
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
-                showError('Supabase 配置未找到！请检查 config.js 文件。');
-                return;
+            if (image.tags && Array.isArray(image.tags)) {
+                image.tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'modal-tag';
+                    tagElement.textContent = tag;
+                    tagElement.onclick = () => {
+                        modal.hide();
+                        filterByTag(tag);
+                    };
+                    tagsContainer.appendChild(tagElement);
+                });
             }
             
-            loadHotTags();
+            modal.show();
+        }
+        
+        // 搜索功能
+        function performSearch() {
+            const searchInput = document.getElementById('searchInput');
+            currentFilters.search = searchInput.value.trim();
+            updateCurrentFiltersDisplay();
+            loadImages(true);
+        }
+        
+        // 按标签过滤
+        function filterByTag(tag) {
+            document.getElementById('searchInput').value = tag;
+            currentFilters.search = tag;
+            updateCurrentFiltersDisplay();
+            loadImages(true);
+        }
+        
+        // 按评级过滤
+        function filterByRating(rating) {
+            currentFilters.rating = rating;
+            document.getElementById('ratingFilter').value = rating;
+            updateCurrentFiltersDisplay();
+            loadImages(true);
+        }
+        
+        // 应用过滤器
+        function applyFilters() {
+            currentFilters.sortBy = document.getElementById('sortBy').value;
+            currentFilters.rating = document.getElementById('ratingFilter').value;
+            updateCurrentFiltersDisplay();
+            loadImages(true);
+        }
+        
+        // 清除过滤器
+        function clearFilters() {
+            currentFilters = {
+                search: '',
+                tags: [],
+                rating: '',
+                sortBy: 'newest'
+            };
+            
+            document.getElementById('searchInput').value = '';
+            document.getElementById('sortBy').value = 'newest';
+            document.getElementById('ratingFilter').value = '';
+            
+            updateCurrentFiltersDisplay();
+            loadImages(true);
+        }
+        
+        // 更新当前过滤器显示
+        function updateCurrentFiltersDisplay() {
+            const container = document.getElementById('currentFilters');
+            const filters = [];
+            
+            if (currentFilters.search) filters.push(`搜索: ${currentFilters.search}`);
+            if (currentFilters.rating) filters.push(`评级: ${currentFilters.rating}`);
+            
+            container.textContent = filters.length > 0 ? filters.join(' | ') : '无过滤条件';
+        }
+        
+        // 加载更多图片
+        function loadMoreImages() {
             loadImages();
-        });
+        }
+        
+        // 加载所有图片
+        function loadAllImages() {
+            clearFilters();
+            closeSidebar();
+        }
+        
+        // 侧边栏控制
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        }
+        
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        }
+        
+        // 加载状态控制
+        function showLoading() {
+            document.getElementById('loadingMask').style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingMask').style.display = 'none';
+        }
+        
+        // 工具函数
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // 图片操作
+        function likeImage() {
+            // 实现点赞功能
+            alert('功能开发中...');
+        }
+        
+        function downloadImage() {
+            const imageUrl = document.getElementById('modalImage').src;
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = 'image.jpg';
+            link.click();
+        }
     </script>
 </body>
 </html>

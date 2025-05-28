@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule34 中转站</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d4a35 50%, #1a1a1a 100%);
+            color: #fafafa;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        
+        .card {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 15px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            border: none;
+            border-radius: 10px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #66bb6a, #4caf50);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            border-radius: 10px;
+        }
+        
+        .status-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: rgba(26, 26, 26, 0.5);
+            border-radius: 8px;
+            border-left: 3px solid #4caf50;
+        }
+        
+        .status-item.processing {
+            border-left-color: #ff9800;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-item.success {
+            border-left-color: #4caf50;
+        }
+        
+        .status-item.error {
+            border-left-color: #f44336;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .tag-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            margin: 0.1rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .tag-artist { background: linear-gradient(45deg, #9c27b0, #ba68c8); }
+        .tag-character { background: linear-gradient(45deg, #2196f3, #64b5f6); }
+        .tag-copyright { background: linear-gradient(45deg, #ff9800, #ffb74d); }
+        .tag-general { background: linear-gradient(45deg, #607d8b, #90a4ae); }
+        
+        .stats-card {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.05));
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 15px;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4caf50;
+        }
+        
+        .config-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-control, .form-select {
+            background-color: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #fafafa;
+            border-radius: 8px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(26, 26, 26, 0.9);
+            border-color: #4caf50;
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+            color: #fafafa;
+        }
+        
+        .image-preview {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mb-4">
+            <h1 class="display-4 fw-bold mb-2">
+                <i class="bi bi-cloud-arrow-up text-success"></i> Rule34 中转站
+            </h1>
+            <p class="lead">自动爬取并上传到画廊 - 一键式解决方案</p>
+        </div>
+        
+        <!-- 统计信息 -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalProcessed">0</div>
+                    <div>已处理</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalSuccess">0</div>
+                    <div>上传成功</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalSkipped">0</div>
+                    <div>已跳过</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalErrors">0</div>
+                    <div>错误</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 配置区域 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="bi bi-gear"></i> 配置设置
+                </h5>
+                
+                <!-- Supabase配置 -->
+                <div class="config-section">
+                    <h6>Supabase 配置</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="supabaseUrl" 
+                                   placeholder="Supabase URL" value="https://ibehtwiqwopghgeblflg.supabase.co">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="supabaseKey" 
+                                   placeholder="Anon Key" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliZWh0d2lxd29wZ2hnZWJsZmxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDM1NzYsImV4cCI6MjA2Mzk3OTU3Nn0.yQaK5fo25uU_sDWAnMQilGAsoX4v4uY2eemt5SVg5tI">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 爬取配置 -->
+                <div class="config-section">
+                    <h6>爬取配置</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">搜索标签</label>
+                            <input type="text" class="form-control" id="searchTags" 
+                                   placeholder="例如: score:>100 或留空爬取全部" value="">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">每批数量</label>
+                            <select class="form-select" id="batchSize">
+                                <option value="10">10张</option>
+                                <option value="20" selected>20张</option>
+                                <option value="50">50张</option>
+                                <option value="100">100张</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">开始页码</label>
+                            <input type="number" class="form-control" id="startPage" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 过滤配置 -->
+                <div class="config-section">
+                    <h6>过滤设置</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">最低评分</label>
+                            <input type="number" class="form-control" id="minScore" value="0" min="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">内容评级</label>
+                            <select class="form-select" id="allowedRatings" multiple>
+                                <option value="s" selected>Safe (安全)</option>
+                                <option value="q" selected>Questionable (可疑)</option>
+                                <option value="e" selected>Explicit (明确)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">跳过已存在</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="skipExisting" checked>
+                                <label class="form-check-label" for="skipExisting">
+                                    自动跳过已上传的图片
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 控制面板 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-play-circle"></i> 控制面板
+                    </h5>
+                    <div>
+                        <button class="btn btn-primary me-2" onclick="testConnection()">
+                            <i class="bi bi-wifi"></i> 测试连接
+                        </button>
+                        <button class="btn btn-success" onclick="startCrawling()" id="startBtn">
+                            <i class="bi bi-play-fill"></i> 开始爬取上传
+                        </button>
+                        <button class="btn btn-warning" onclick="pauseCrawling()" id="pauseBtn" style="display:none;">
+                            <i class="bi bi-pause-fill"></i> 暂停
+                        </button>
+                        <button class="btn btn-danger" onclick="stopCrawling()" id="stopBtn" style="display:none;">
+                            <i class="bi bi-stop-fill"></i> 停止
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 进度条 -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>处理进度</span>
+                        <span id="progressText">0 / 0</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- 当前状态 -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>当前状态：</strong>
+                        <span id="currentStatus" class="text-muted">待机中</span>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <strong>速度：</strong>
+                        <span id="processingSpeed" class="text-info">- 张/分钟</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 处理日志 -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-list-ul"></i> 处理日志
+                    </h5>
+                    <button class="btn btn-outline-light btn-sm" onclick="clearLog()">
+                        <i class="bi bi-trash"></i> 清空日志
+                    </button>
+                </div>
+                <div class="status-container" id="statusLog">
+                    <div class="text-muted text-center">等待开始处理...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // 全局变量
+        let supabase = null;
+        let isRunning = false;
+        let isPaused = false;
+        let shouldStop = false;
+        let currentPage = 0;
+        let stats = {
+            processed: 0,
+            success: 0,
+            skipped: 0,
+            errors: 0
+        };
+        let startTime = null;
+        let existingHashes = new Set();
+        
+        // 初始化连接测试
+        async function testConnection() {
+            const url = document.getElementById('supabaseUrl').value;
+            const key = document.getElementById('supabaseKey').value;
+            
+            if (!url || !key) {
+                alert('请填写Supabase连接信息');
+                return false;
+            }
+            
+            try {
+                const { createClient } = window.supabase;
+                supabase = createClient(url, key);
+                
+                // 测试连接
+                const { data, error } = await supabase
+                    .from('images')
+                    .select('id, md5')
+                    .limit(1);
+                
+                if (error) throw error;
+                
+                addLog('success', '✅ Supabase连接成功');
+                
+                // 加载已存在的图片MD5
+                await loadExistingHashes();
+                
+                return true;
+            } catch (error) {
+                addLog('error', `❌ 连接失败: ${error.message}`);
+                return false;
+            }
+        }
+        
+        // 加载已存在的图片MD5
+        async function loadExistingHashes() {
+            try {
+                addLog('processing', '📋 加载已存在图片列表...');
+                
+                let allHashes = [];
+                let from = 0;
+                const batchSize = 1000;
+                
+                while (true) {
+                    const { data, error } = await supabase
+                        .from('images')
+                        .select('md5')
+                        .range(from, from + batchSize - 1);
+                    
+                    if (error) throw error;
+                    
+                    if (data.length === 0) break;
+                    
+                    allHashes = allHashes.concat(data.map(item => item.md5).filter(md5 => md5));
+                    from += batchSize;
+                }
+                
+                existingHashes = new Set(allHashes);
+                addLog('success', `📚 已加载 ${existingHashes.size} 个已存在图片的MD5`);
+                
+            } catch (error) {
+                addLog('error', `❌ 加载已存在图片失败: ${error.message}`);
+            }
+        }
+        
+        // 开始爬取
+        async function startCrawling() {
+            if (!(await testConnection())) return;
+            
+            if (isRunning) return;
+            
+            isRunning = true;
+            isPaused = false;
+            shouldStop = false;
+            startTime = Date.now();
+            
+            // 重置统计
+            stats = { processed: 0, success: 0, skipped: 0, errors: 0 };
+            updateStats();
+            
+            // 更新UI
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            document.getElementById('currentStatus').textContent = '正在爬取中...';
+            
+            currentPage = parseInt(document.getElementById('startPage').value) || 0;
+            
+            addLog('processing', '🚀 开始爬取Rule34图片...');
+            
+            try {
+                await processBatch();
+            } catch (error) {
+                addLog('error', `❌ 爬取过程出错: ${error.message}`);
+                stopCrawling();
+            }
+        }
+        
+        // 处理一批图片
+        async function processBatch() {
+            while (isRunning && !shouldStop) {
+                if (isPaused) {
+                    await new Promise(resolve => {
+                        const checkPause = () => {
+                            if (!isPaused || shouldStop) {
+                                resolve();
+                            } else {
+                                setTimeout(checkPause, 1000);
+                            }
+                        };
+                        checkPause();
+                    });
+                    continue;
+                }
+                
+                const batchSize = parseInt(document.getElementById('batchSize').value);
+                const searchTags = document.getElementById('searchTags').value.trim();
+                
+                addLog('processing', `📄 获取第 ${currentPage + 1} 页数据 (每页${batchSize}张)...`);
+                
+                try {
+                    // 构建Rule34 API请求
+                    const apiUrl = 'https://api.rule34.xxx/index.php';
+                    const params = new URLSearchParams({
+                        page: 'dapi',
+                        s: 'post',
+                        q: 'index',
+                        limit: batchSize,
+                        pid: currentPage
+                    });
+                    
+                    if (searchTags) {
+                        params.set('tags', searchTags);
+                    }
+                    
+                    const response = await fetch(`${apiUrl}?${params}`, {
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const xmlText = await response.text();
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                    const posts = xmlDoc.getElementsByTagName('post');
+                    
+                    if (posts.length === 0) {
+                        addLog('success', '🏁 没有更多图片，爬取完成');
+                        stopCrawling();
+                        break;
+                    }
+                    
+                    addLog('success', `📦 获取到 ${posts.length} 张图片，开始处理...`);
+                    
+                    // 处理每张图片
+                    for (let i = 0; i < posts.length && isRunning && !shouldStop; i++) {
+                        if (isPaused) break;
+                        
+                        const post = posts[i];
+                        await processImage(post, i + 1, posts.length);
+                        
+                        // 更新进度
+                        const progress = ((i + 1) / posts.length) * 100;
+                        updateProgress(i + 1, posts.length, progress);
+                        
+                        // 避免请求过快
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                    
+                    currentPage++;
+                    
+                } catch (error) {
+                    addLog('error', `❌ 获取第 ${currentPage + 1} 页失败: ${error.message}`);
+                    stats.errors++;
+                    updateStats();
+                    
+                    // 等待一段时间后继续
+                    await new Promise(resolve => setTimeout(resolve, 5000));
+                    currentPage++;
+                }
+            }
+        }
+        
+        // 处理单张图片
+        async function processImage(post, index, total) {
+            const id = post.getAttribute('id');
+            const md5 = post.getAttribute('md5');
+            const fileUrl = post.getAttribute('file_url');
+            const tags = post.getAttribute('tags') || '';
+            const score = parseInt(post.getAttribute('score')) || 0;
+            const rating = post.getAttribute('rating') || '';
+            const width = post.getAttribute('width');
+            const height = post.getAttribute('height');
+            
+            const logPrefix = `[${index}/${total}] ID:${id}`;
+            
+            try {
+                // 检查评分过滤
+                const minScore = parseInt(document.getElementById('minScore').value) || 0;
+                if (score < minScore) {
+                    addLog('skipped', `${logPrefix} ⏭️ 评分过低 (${score} < ${minScore})`);
+                    stats.skipped++;
+                    stats.processed++;
+                    updateStats();
+                    return;
+                }
+                
+                // 检查评级过滤
+                const allowedRatings = Array.from(document.getElementById('allowedRatings').selectedOptions)
+                    .map(option => option.value);
+                if (!allowedRatings.includes(rating)) {
+                    addLog('skipped', `${logPrefix} ⏭️ 评级不允许 (${rating})`);
+                    stats.skipped++;
+                    stats.processed++;
+                    updateStats();
+                    return;
+                }
+                
+                // 检查是否已存在
+                if (document.getElementById('skipExisting').checked && md5 && existingHashes.has(md5)) {
+                    addLog('skipped', `${logPrefix} ⏭️ 已存在 (MD5: ${md5.substring(0, 8)}...)`);
+                    stats.skipped++;
+                    stats.processed++;
+                    updateStats();
+                    return;
+                }
+                
+                addLog('processing', `${logPrefix} 🔄 开始处理...`);
+                
+                // 分类标签
+                const categorizedTags = await categorizeTagsFromRule34(tags.split(' ').filter(tag => tag.trim()));
+                
+                // 下载图片
+                const imageBlob = await downloadImage(fileUrl);
+                if (!imageBlob) {
+                    throw new Error('图片下载失败');
+                }
+                
+                // 生成文件名
+                const fileExt = fileUrl.split('.').pop().split('?')[0] || 'jpg';
+                const filename = `${id}.${fileExt}`;
+                
+                // 上传到Supabase存储
+                const filePath = `rule/${filename}`;
+                const { error: uploadError } = await supabase.storage
+                    .from('rule')
+                    .upload(filePath, imageBlob, {
+                        contentType: `image/${fileExt}`,
+                        upsert: false
+                    });
+                
+                if (uploadError) {
+                    throw new Error(`上传失败: ${uploadError.message}`);
+                }
+                
+                // 保存到数据库
+                const { error: dbError } = await supabase
+                    .from('images')
+                    .insert({
+                        file_path: filePath,
+                        original_filename: filename,
+                        tags: categorizedTags.supabase_tags,
+                        md5: md5,
+                        rule34_id: id,
+                        score: score,
+                        rating: rating,
+                        width: parseInt(width),
+                        height: parseInt(height),
+                        metadata: {
+                            tags: categorizedTags,
+                            rule34_url: `https://rule34.xxx/index.php?page=post&s=view&id=${id}`
+                        }
+                    });
+                
+                if (dbError) {
+                    // 如果数据库插入失败，删除已上传的文件
+                    await supabase.storage.from('rule').remove([filePath]);
+                    throw new Error(`数据库保存失败: ${dbError.message}`);
+                }
+                
+                // 添加到已存在列表
+                if (md5) {
+                    existingHashes.add(md5);
+                }
+                
+                addLog('success', `${logPrefix} ✅ 上传成功 - ${categorizedTags.artist.length}艺术家, ${categorizedTags.character.length}角色, ${categorizedTags.copyright.length}版权, ${categorizedTags.general.length}一般标签`);
+                
+                stats.success++;
+                stats.processed++;
+                updateStats();
+                
+            } catch (error) {
+                addLog('error', `${logPrefix} ❌ 处理失败: ${error.message}`);
+                stats.errors++;
+                stats.processed++;
+                updateStats();
+            }
+        }
+        
+        // 从Rule34标签分类
+        async function categorizeTagsFromRule34(tags) {
+            const categorized = {
+                artist: [],
+                character: [],
+                copyright: [],
+                general: [],
+                supabase_tags: []
+            };
+            
+            // 通过Rule34 API获取标签类型
+            for (const tag of tags) {
+                if (!tag.trim()) continue;
+                
+                try {
+                    const apiUrl = 'https://api.rule34.xxx/index.php';
+                    const params = new URLSearchParams({
+                        page: 'dapi',
+                        s: 'tag',
+                        q: 'index',
+                        name: tag
+                    });
+                    
+                    const response = await fetch(`${apiUrl}?${params}`);
+                    const xmlText = await response.text();
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                    const tagElement = xmlDoc.getElementsByTagName('tag')[0];
+                    
+                    if (tagElement) {
+                        const type = parseInt(tagElement.getAttribute('type')) || 0;
+                        
+                        switch (type) {
+                            case 1: // artist
+                                categorized.artist.push(tag);
+                                categorized.supabase_tags.push(`artist:${tag}`);
+                                break;
+                            case 4: // character
+                                categorized.character.push(tag);
+                                categorized.supabase_tags.push(`character:${tag}`);
+                                break;
+                            case 3: // copyright
+                                categorized.copyright.push(tag);
+                                categorized.supabase_tags.push(`copyright:${tag}`);
+                                break;
+                            default: // general
+                                categorized.general.push(tag);
+                                categorized.supabase_tags.push(tag);
+                                break;
+                        }
+                    } else {
+                        categorized.general.push(tag);
+                        categorized.supabase_tags.push(tag);
+                    }
+                    
+                    // 避免API请求过快
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                } catch (error) {
+                    // 如果获取标签类型失败，默认为一般标签
+                    categorized.general.push(tag);
+                    categorized.supabase_tags.push(tag);
+                }
+            }
+            
+            return categorized;
+        }
+        
+        // 下载图片
+        async function downloadImage(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return await response.blob();
+            } catch (error) {
+                console.error('下载图片失败:', error);
+                return null;
+            }
+        }
+        
+        // 暂停爬取
+        function pauseCrawling() {
+            if (!isRunning) return;
+            
+            isPaused = !isPaused;
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            if (isPaused) {
+                pauseBtn.innerHTML = '<i class="bi bi-play-fill"></i> 继续';
+                document.getElementById('currentStatus').textContent = '已暂停';
+                addLog('processing', '⏸️ 爬取已暂停');
+            } else {
+                pauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i> 暂停';
+                document.getElementById('currentStatus').textContent = '正在爬取中...';
+                addLog('processing', '▶️ 爬取已继续');
+            }
+        }
+        
+        // 停止爬取
+        function stopCrawling() {
+            isRunning = false;
+            shouldStop = true;
+            isPaused = false;
+            
+            // 更新UI
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('currentStatus').textContent = '已停止';
+            
+            addLog('processing', '🛑 爬取已停止');
+        }
+        
+        // 更新统计信息
+        function updateStats() {
+            document.getElementById('totalProcessed').textContent = stats.processed;
+            document.getElementById('totalSuccess').textContent = stats.success;
+            document.getElementById('totalSkipped').textContent = stats.skipped;
+            document.getElementById('totalErrors').textContent = stats.errors;
+            
+            // 计算处理速度
+            if (startTime && stats.processed > 0) {
+                const elapsed = (Date.now() - startTime) / 1000 / 60; // 分钟
+                const speed = (stats.processed / elapsed).toFixed(1);
+                document.getElementById('processingSpeed').textContent = `${speed} 张/分钟`;
+            }
+        }
+        
+        // 更新进度
+        function updateProgress(current, total, percentage) {
+            document.getElementById('progressText').textContent = `${current} / ${total}`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+        }
+        
+        // 添加日志
+        function addLog(type, message) {
+            const statusLog = document.getElementById('statusLog');
+            const logItem = document.createElement('div');
+            logItem.className = `status-item ${type}`;
+            
+            const time = new Date().toLocaleTimeString();
+            logItem.innerHTML = `
+                <div class="flex-grow-1">
+                    <span class="text-muted">[${time}]</span> ${message}
+                </div>
+            `;
+            
+            // 如果是第一条日志，清空占位符
+            if (statusLog.children.length === 1 && statusLog.children[0].classList.contains('text-muted')) {
+                statusLog.innerHTML = '';
+            }
+            
+            statusLog.appendChild(logItem);
+            statusLog.scrollTop = statusLog.scrollHeight;
+            
+            // 限制日志数量
+            if (statusLog.children.length > 100) {
+                statusLog.removeChild(statusLog.firstChild);
+            }
+        }
+        
+        // 清空日志
+        function clearLog() {
+            document.getElementById('statusLog').innerHTML = '<div class="text-muted text-center">日志已清空</div>';
+        }
+        
+        // 页面加载完成后自动测试连接
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以在这里自动测试连接
+            // testConnection();
+        });
+    </script>
+</body>
+</html> 
