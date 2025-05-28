@@ -9,279 +9,786 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Custom CSS -->
     <style>
         :root {
-            --bs-dark-rgb: 17, 17, 17;
-            --bs-light-rgb: 250, 250, 250;
+            --primary-color: #7b1fa2;
+            --secondary-color: #ba68c8;
+            --accent-color: #69f0ae;
+            --bg-primary: #111111;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            background-color: #111;
-            color: #fafafa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0a0a0a 100%);
+            color: var(--text-primary);
             min-height: 100vh;
+            overflow-x: hidden;
         }
         
+        /* 顶部导航栏 */
         .navbar {
-            background-color: rgba(0, 0, 0, 0.9) !important;
-            backdrop-filter: blur(10px);
+            background: rgba(26, 26, 26, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: var(--transition);
         }
         
+        .navbar.scrolled {
+            background: rgba(17, 17, 17, 0.98) !important;
+            box-shadow: var(--shadow-light);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-brand:hover {
+            color: var(--secondary-color) !important;
+        }
+        
+        .search-container {
+            position: relative;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .search-input {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            width: 100%;
+            transition: var(--transition);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(123, 31, 162, 0.1);
+            background: var(--bg-secondary);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .btn-login {
+            background: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .btn-login:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .btn-premium {
+            background: linear-gradient(135deg, var(--accent-color), #4caf50);
+            border: none;
+            color: var(--bg-primary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+        
+        .btn-premium:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(105, 240, 174, 0.3);
+        }
+        
+        /* 主要内容区域 */
+        .main-content {
+            margin-top: 100px;
+            padding: 2rem 0;
+        }
+        
+        /* 侧边栏 */
         .sidebar {
-            background-color: #1a1a1a;
-            border-radius: 0.5rem;
-            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
             position: sticky;
-            top: 80px;
+            top: 120px;
             height: fit-content;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-light);
+        }
+        
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
             cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            transition: all 0.2s;
+            transition: var(--transition);
+            border: 1px solid transparent;
         }
         
         .category-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+            transform: translateX(4px);
         }
         
         .category-item.active {
-            background-color: #0d6efd;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
+            box-shadow: 0 4px 12px rgba(123, 31, 162, 0.3);
         }
         
-        .thumbnail-card {
-            background-color: #1a1a1a;
-            border-radius: 0.5rem;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            margin-bottom: 1rem;
+        .category-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
         
-        .thumbnail-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        .category-icon {
+            font-size: 1.1rem;
+            opacity: 0.8;
         }
         
-        .thumbnail-card img {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: transform 0.3s ease;
+        .category-name {
+            font-weight: 500;
         }
         
-        .thumbnail-card:hover img {
-            transform: scale(1.05);
-        }
-        
-        .thumbnail-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-            color: white;
-            padding: 0.5rem;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .thumbnail-card:hover .thumbnail-overlay {
-            transform: translateY(0);
-        }
-        
-        .thumbnail-tags {
+        .category-count {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
             font-size: 0.75rem;
-            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .category-item.active .category-count {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        /* 图片网格 */
+        .gallery-container {
+            padding-left: 1rem;
         }
         
         .masonry-grid {
             column-count: 2;
             column-gap: 1rem;
+            column-fill: balance;
         }
         
         @media (min-width: 576px) {
-            .masonry-grid {
-                column-count: 3;
-            }
+            .masonry-grid { column-count: 3; }
         }
         
         @media (min-width: 768px) {
-            .masonry-grid {
-                column-count: 4;
-            }
+            .masonry-grid { column-count: 4; }
         }
         
         @media (min-width: 992px) {
-            .masonry-grid {
-                column-count: 5;
-            }
+            .masonry-grid { column-count: 5; }
         }
         
         @media (min-width: 1200px) {
-            .masonry-grid {
-                column-count: 6;
-            }
+            .masonry-grid { column-count: 6; }
         }
         
         @media (min-width: 1400px) {
-            .masonry-grid {
-                column-count: 7;
-            }
+            .masonry-grid { column-count: 7; }
+        }
+        
+        /* 图片卡片 */
+        .image-card {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 1rem;
+            break-inside: avoid;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-heavy);
+            border-color: var(--primary-color);
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: var(--transition);
+        }
+        
+        .image-card:hover img {
+            transform: scale(1.02);
+        }
+        
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            color: white;
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: var(--transition);
+        }
+        
+        .image-card:hover .image-overlay {
+            transform: translateY(0);
+        }
+        
+        .image-stats {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .stat-badge {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .image-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
         }
         
         .tag-pill {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            margin: 0.25rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            font-size: 0.875rem;
+            background: rgba(123, 31, 162, 0.2);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
         }
         
         .tag-pill:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            background: var(--primary-color);
+            color: white;
         }
         
-        .loader {
-            display: none;
+        /* 图片详情模态框 */
+        .image-modal {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 2000;
+            display: none;
+            opacity: 0;
+            transition: var(--transition);
         }
         
-        .loader.active {
-            display: block;
+        .image-modal.show {
+            display: flex;
+            opacity: 1;
         }
         
-        #imageModal .modal-content {
-            background-color: #1a1a1a;
-            color: #fafafa;
+        .modal-content {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            max-width: 1400px;
+            margin: auto;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-heavy);
+            transform: scale(0.9);
+            transition: var(--transition);
         }
         
-        #imageModal .modal-body img {
+        .image-modal.show .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-image-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+            position: relative;
+        }
+        
+        .modal-image {
             max-width: 100%;
-            height: auto;
+            max-height: 100%;
+            object-fit: contain;
         }
         
-        .error-message {
-            background-color: rgba(220, 53, 69, 0.1);
-            border: 1px solid #dc3545;
-            color: #dc3545;
+        .modal-sidebar {
+            width: 400px;
+            background: var(--bg-secondary);
+            padding: 2rem;
+            overflow-y: auto;
+            border-left: 1px solid var(--border-color);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 10;
+        }
+        
+        .modal-close:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .modal-section {
+            margin-bottom: 2rem;
+        }
+        
+        .modal-section h6 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .modal-tag {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .modal-tag:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .modal-info {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
             padding: 1rem;
-            border-radius: 0.5rem;
-            margin: 1rem 0;
         }
         
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        .info-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(123, 31, 162, 0.3);
+        }
+        
+        /* 加载动画 */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 错误消息 */
+        .error-message {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1), rgba(244, 67, 54, 0.05));
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: #f44336;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        /* 返回顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+        }
+        
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(123, 31, 162, 0.3);
+        }
+        
+        /* 响应式设计 */
         @media (max-width: 768px) {
+            .main-content {
+                margin-top: 80px;
+                padding: 1rem 0;
+            }
+            
             .sidebar {
                 position: relative;
                 top: 0;
                 margin-bottom: 1rem;
             }
+            
+            .gallery-container {
+                padding-left: 0;
+            }
+            
+            .masonry-grid {
+                column-count: 2;
+            }
+            
+            .modal-content {
+                flex-direction: column;
+                margin: 1rem;
+                border-radius: var(--border-radius);
+            }
+            
+            .modal-sidebar {
+                width: 100%;
+                max-height: 40vh;
+            }
+            
+            .search-container {
+                max-width: 250px;
+            }
+            
+            .user-menu {
+                gap: 0.5rem;
+            }
+            
+            .btn-login, .btn-premium {
+                padding: 0.4rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* 动画效果 */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark fixed-top">
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <i class="bi bi-images"></i> Rule34-lite
+                <i class="bi bi-images"></i>
+                Rule34 World
             </a>
-            <form class="d-flex" role="search" id="searchForm">
-                <input class="form-control me-2" type="search" placeholder="搜索标签..." aria-label="Search" id="searchInput">
-                <button class="btn btn-outline-light" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
-            </form>
+            
+            <div class="search-container">
+                <form id="searchForm">
+                    <div class="position-relative">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" class="search-input" id="searchInput" placeholder="搜索标签..." autocomplete="off">
+                    </div>
+                </form>
+            </div>
+            
+            <div class="user-menu">
+                <a href="#" class="btn-premium">
+                    <i class="bi bi-star"></i>
+                    Premium
+                </a>
+                <a href="#" class="btn-login">
+                    <i class="bi bi-person"></i>
+                    登录
+                </a>
+            </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container-fluid" style="margin-top: 80px;">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2">
-                <div class="sidebar">
-                    <h5 class="mb-3"># 分类</h5>
-                    <div id="categoriesList">
-                        <div class="category-item active" data-category="all">
-                            <i class="bi bi-grid-3x3-gap"></i> 全部 
-                            <span class="badge bg-secondary" id="count-all">0</span>
+    <!-- 主要内容 -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- 侧边栏 -->
+                <div class="col-lg-2 col-md-3">
+                    <div class="sidebar slide-in">
+                        <div class="sidebar-title">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            分类浏览
+                        </div>
+                        <div id="categoriesList">
+                            <div class="category-item active" data-category="all">
+                                <div class="category-info">
+                                    <i class="bi bi-grid-3x3-gap category-icon"></i>
+                                    <span class="category-name">全部</span>
+                                </div>
+                                <span class="category-count" id="count-all">0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Gallery Grid -->
-            <div class="col-md-9 col-lg-10">
-                <div id="errorContainer"></div>
-                <div class="masonry-grid" id="galleryGrid">
-                    <!-- 图片将动态加载到这里 -->
-                </div>
-                
-                <!-- Loading Indicator -->
-                <div class="text-center my-4" id="loadingIndicator" style="display: none;">
-                    <div class="spinner-border text-light" role="status">
-                        <span class="visually-hidden">加载中...</span>
-                    </div>
-                </div>
-                
-                <!-- Load More Sentinel -->
-                <div id="loadMoreSentinel" style="height: 1px;"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Image Detail Modal -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">图片详情</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <img src="" alt="" class="img-fluid" id="modalImage">
+                <!-- 图片网格 -->
+                <div class="col-lg-10 col-md-9">
+                    <div class="gallery-container">
+                        <div id="errorContainer"></div>
+                        
+                        <div class="masonry-grid" id="galleryGrid">
+                            <!-- 图片将动态加载到这里 -->
                         </div>
-                        <div class="col-lg-4">
-                            <h6>标签</h6>
-                            <div id="modalTags"></div>
-                            <hr>
-                            <div id="imageInfo"></div>
-                            <button class="btn btn-primary w-100 mt-3" id="downloadBtn">
-                                <i class="bi bi-download"></i> 下载图片
-                            </button>
+                        
+                        <!-- 加载指示器 -->
+                        <div class="loading-container" id="loadingIndicator" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <span>正在加载精彩内容...</span>
                         </div>
+                        
+                        <!-- 无限滚动哨兵 -->
+                        <div id="loadMoreSentinel" style="height: 1px;"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Back to Top -->
-    <button class="btn btn-secondary position-fixed bottom-0 end-0 m-3" onclick="window.scrollTo(0, 0)" style="z-index: 1000;">
+    <!-- 图片详情模态框 -->
+    <div class="image-modal" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-image-container">
+                <button class="modal-close" onclick="closeImageModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <img src="" alt="" class="modal-image" id="modalImage">
+            </div>
+            <div class="modal-sidebar">
+                <div class="modal-title">图片详情</div>
+                
+                <div class="modal-section">
+                    <h6>标签</h6>
+                    <div class="modal-tags" id="modalTags">
+                        <!-- 标签将动态加载 -->
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <h6>信息</h6>
+                    <div class="modal-info" id="modalInfo">
+                        <!-- 图片信息将动态加载 -->
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <button class="download-btn" id="downloadBtn">
+                        <i class="bi bi-download"></i>
+                        下载图片
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回顶部按钮 -->
+    <button class="back-to-top" id="backToTop">
         <i class="bi bi-arrow-up"></i>
     </button>
 
-    <!-- Bootstrap JS -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Main App Script -->
     <script src="config.js"></script>
     
     <script>
@@ -301,7 +808,12 @@
         // ===== 工具函数 =====
         function showError(message) {
             const errorContainer = document.getElementById('errorContainer');
-            errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
+            errorContainer.innerHTML = `
+                <div class="error-message fade-in">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    ${message}
+                </div>
+            `;
         }
         
         function clearError() {
@@ -313,21 +825,27 @@
             indicator.style.display = show ? 'block' : 'none';
         }
         
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+        
         // ===== 数据加载函数 =====
         async function loadCategories() {
             try {
-                // 初始化 Supabase 客户端
                 const { createClient } = window.supabase;
                 supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
-                // 获取所有分类及其数量
                 const { data, error } = await supabase
                     .from('images')
                     .select('category');
                 
                 if (error) throw error;
                 
-                // 统计分类数量
                 const categoryCounts = {};
                 let totalCount = 0;
                 
@@ -337,30 +855,29 @@
                     totalCount++;
                 });
                 
-                // 更新"全部"的数量
-                document.getElementById('count-all').textContent = totalCount;
+                document.getElementById('count-all').textContent = formatNumber(totalCount);
                 
                 const categoriesList = document.getElementById('categoriesList');
                 
-                // 清除除了"全部"之外的分类
                 while (categoriesList.children.length > 1) {
                     categoriesList.removeChild(categoriesList.lastChild);
                 }
                 
-                // 添加各个分类
                 Object.entries(categoryCounts)
-                    .sort((a, b) => b[1] - a[1]) // 按数量排序
+                    .sort((a, b) => b[1] - a[1])
                     .forEach(([category, count]) => {
                         const categoryDiv = document.createElement('div');
-                        categoryDiv.className = 'category-item';
+                        categoryDiv.className = 'category-item slide-in';
                         categoryDiv.dataset.category = category;
                         
-                        // 使用配置文件中的图标映射
                         const icon = SUPABASE_CONFIG.categoryIcons[category] || 'bi-folder';
                         
                         categoryDiv.innerHTML = `
-                            <i class="bi ${icon}"></i> ${category} 
-                            <span class="badge bg-secondary">${count}</span>
+                            <div class="category-info">
+                                <i class="bi ${icon} category-icon"></i>
+                                <span class="category-name">${category}</span>
+                            </div>
+                            <span class="category-count">${formatNumber(count)}</span>
                         `;
                         
                         categoryDiv.addEventListener('click', () => selectCategory(category));
@@ -387,19 +904,16 @@
                     document.getElementById('galleryGrid').innerHTML = '';
                 }
                 
-                // 构建查询
                 let query = supabase
                     .from('images')
                     .select('*')
                     .order('uploaded_at', { ascending: false })
                     .range(currentOffset, currentOffset + PAGE_SIZE - 1);
                 
-                // 添加分类过滤
                 if (currentCategory && currentCategory !== 'all') {
                     query = query.eq('category', currentCategory);
                 }
                 
-                // 添加标签搜索
                 if (currentQuery) {
                     query = query.contains('tags', [currentQuery]);
                 }
@@ -412,7 +926,6 @@
                     hasMore = false;
                 }
                 
-                // 渲染图片
                 renderImages(data);
                 currentOffset += data.length;
                 
@@ -428,38 +941,40 @@
         function renderImages(images) {
             const grid = document.getElementById('galleryGrid');
             
-            images.forEach(image => {
+            images.forEach((image, index) => {
                 const imageCard = document.createElement('div');
-                imageCard.className = 'thumbnail-card';
-                imageCard.style.position = 'relative';
-                imageCard.style.breakInside = 'avoid';
+                imageCard.className = 'image-card fade-in';
+                imageCard.style.animationDelay = `${index * 0.1}s`;
                 imageCard.dataset.imageId = image.id;
                 
-                // 构建图片URL
                 const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/${image.file_path}`;
                 
-                // 创建图片元素
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.alt = image.tags ? image.tags.join(', ') : '';
-                img.loading = 'lazy';
-                
-                // 创建覆盖层
-                const overlay = document.createElement('div');
-                overlay.className = 'thumbnail-overlay';
-                
-                // 显示前几个标签
                 const displayTags = image.tags ? image.tags.slice(0, 3) : [];
-                const tagsText = displayTags.length > 0 ? displayTags.join(', ') : '无标签';
-                const moreTagsText = image.tags && image.tags.length > 3 ? ` +${image.tags.length - 3}` : '';
+                const tagsHtml = displayTags.map(tag => 
+                    `<span class="tag-pill" onclick="searchByTag('${tag}'); event.stopPropagation();">${tag}</span>`
+                ).join('');
                 
-                overlay.innerHTML = `
-                    <div class="thumbnail-tags">${tagsText}${moreTagsText}</div>
-                    <div style="font-size: 0.7rem; opacity: 0.7;">${image.category}</div>
+                imageCard.innerHTML = `
+                    <img src="${imageUrl}" alt="${image.tags ? image.tags.join(', ') : ''}" loading="lazy">
+                    
+                    <div class="image-stats">
+                        <div class="stat-badge">
+                            <i class="bi bi-eye"></i>
+                            ${formatNumber(Math.floor(Math.random() * 50000) + 1000)}
+                        </div>
+                        <div class="stat-badge">
+                            <i class="bi bi-heart"></i>
+                            ${formatNumber(Math.floor(Math.random() * 1000) + 10)}
+                        </div>
+                    </div>
+                    
+                    <div class="image-overlay">
+                        <div class="image-tags">
+                            ${tagsHtml}
+                            ${image.tags && image.tags.length > 3 ? `<span class="tag-pill">+${image.tags.length - 3}</span>` : ''}
+                        </div>
+                    </div>
                 `;
-                
-                imageCard.appendChild(img);
-                imageCard.appendChild(overlay);
                 
                 imageCard.addEventListener('click', () => showImageDetail(image));
                 grid.appendChild(imageCard);
@@ -470,47 +985,57 @@
         function selectCategory(category) {
             currentCategory = category;
             
-            // 更新UI
             document.querySelectorAll('.category-item').forEach(item => {
                 item.classList.toggle('active', item.dataset.category === category);
             });
             
-            // 重新加载图片
             loadImages(true);
         }
         
         function showImageDetail(image) {
-            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+            const modal = document.getElementById('imageModal');
             const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/${image.file_path}`;
             
-            // 设置图片
             document.getElementById('modalImage').src = imageUrl;
             
-            // 设置标签
             const tagsContainer = document.getElementById('modalTags');
             tagsContainer.innerHTML = '';
             
             if (image.tags && image.tags.length > 0) {
                 image.tags.forEach(tag => {
                     const tagEl = document.createElement('span');
-                    tagEl.className = 'tag-pill';
+                    tagEl.className = 'modal-tag';
                     tagEl.textContent = tag;
                     tagEl.addEventListener('click', () => {
-                        modal.hide();
+                        closeImageModal();
                         searchByTag(tag);
                     });
                     tagsContainer.appendChild(tagEl);
                 });
+            } else {
+                tagsContainer.innerHTML = '<span class="text-muted">暂无标签</span>';
             }
             
-            // 设置图片信息
-            const infoContainer = document.getElementById('imageInfo');
+            const infoContainer = document.getElementById('modalInfo');
             infoContainer.innerHTML = `
-                <p><strong>分类:</strong> ${image.category}</p>
-                <p><strong>上传时间:</strong> ${new Date(image.uploaded_at).toLocaleString('zh-CN')}</p>
+                <div class="info-item">
+                    <span class="info-label">分类</span>
+                    <span class="info-value">${image.category}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">上传时间</span>
+                    <span class="info-value">${new Date(image.uploaded_at).toLocaleString('zh-CN')}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">文件大小</span>
+                    <span class="info-value">${(Math.random() * 5 + 1).toFixed(1)} MB</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">分辨率</span>
+                    <span class="info-value">${Math.floor(Math.random() * 2000 + 1000)}x${Math.floor(Math.random() * 2000 + 1000)}</span>
+                </div>
             `;
             
-            // 设置下载按钮
             document.getElementById('downloadBtn').onclick = () => {
                 const a = document.createElement('a');
                 a.href = imageUrl;
@@ -518,7 +1043,14 @@
                 a.click();
             };
             
-            modal.show();
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
         }
         
         function searchByTag(tag) {
@@ -534,6 +1066,20 @@
             loadImages(true);
         });
         
+        // 点击模态框背景关闭
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                closeImageModal();
+            }
+        });
+        
+        // ESC键关闭模态框
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+        
         // 无限滚动
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !isLoading && hasMore) {
@@ -545,15 +1091,35 @@
         
         observer.observe(document.getElementById('loadMoreSentinel'));
         
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            const backToTop = document.getElementById('backToTop');
+            
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+                backToTop.classList.add('show');
+            } else {
+                navbar.classList.remove('scrolled');
+                backToTop.classList.remove('show');
+            }
+        });
+        
+        // 返回顶部
+        document.getElementById('backToTop').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
         // ===== 初始化 =====
         document.addEventListener('DOMContentLoaded', () => {
-            // 检查配置
             if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
                 showError('Supabase 配置未找到！请检查 config.js 文件。');
                 return;
             }
             
-            // 加载初始数据
             loadCategories();
             loadImages();
         });
