@@ -28,6 +28,10 @@ class Rule34Scraper:
         os.makedirs(output_dir, exist_ok=True)
         os.makedirs(os.path.join(output_dir, "images"), exist_ok=True)
         
+        # 加载已存在的元数据
+        self.existing_metadata = self.load_existing_metadata()
+        self.existing_ids = {item['id'] for item in self.existing_metadata}
+        
         # 标签分类
         self.tag_categories = {
             'artist': [],      # 艺术家
@@ -35,6 +39,16 @@ class Rule34Scraper:
             'copyright': [],   # 版权/作品
             'general': []      # 一般标签
         }
+    
+    def load_existing_metadata(self):
+        """加载已存在的元数据"""
+        if os.path.exists(self.metadata_file):
+            try:
+                with open(self.metadata_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except:
+                return []
+        return []
     
     def get_posts(self, tags="", limit=100, page=0):
         """获取帖子列表"""
@@ -135,26 +149,40 @@ class Rule34Scraper:
     
     def download_image(self, url, filename):
         """下载图片"""
+        filepath = os.path.join(self.output_dir, "images", filename)
+        
+        # 检查文件是否已存在
+        if os.path.exists(filepath):
+            print(f"  ⏭️  文件已存在，跳过下载: {filename}")
+            return True
+        
         try:
             response = self.session.get(url, stream=True)
             response.raise_for_status()
             
-            filepath = os.path.join(self.output_dir, "images", filename)
             with open(filepath, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=8192):
                     f.write(chunk)
             
+            print(f"  ✅ 下载完成: {filename}")
             return True
         except Exception as e:
-            print(f"下载图片失败 {url}: {e}")
+            print(f"  ❌ 下载图片失败 {url}: {e}")
             return False
     
     def process_posts(self, posts):
         """处理帖子列表"""
-        metadata = []
+        new_metadata = []
+        skipped_count = 0
         
         for i, post in enumerate(posts):
-            print(f"处理帖子 {i+1}/{len(posts)}: ID {post['id']}")
+            print(f"\n处理帖子 {i+1}/{len(posts)}: ID {post['id']}")
+            
+            # 检查是否已经爬取过
+            if post['id'] in self.existing_ids:
+                print(f"  ⏭️  已存在，跳过: ID {post['id']}")
+                skipped_count += 1
+                continue
             
             # 获取文件扩展名
             file_ext = os.path.splitext(urlparse(post['file_url']).path)[1]
@@ -163,7 +191,7 @@ class Rule34Scraper:
             # 下载图片
             if self.download_image(post['file_url'], filename):
                 # 分类标签
-                print("  分析标签类型...")
+                print("  🏷️  分析标签类型...")
                 categorized_tags = self.categorize_tags(post['tags'])
                 
                 # 创建元数据
@@ -187,8 +215,10 @@ class Rule34Scraper:
                     'supabase_tags': self.generate_supabase_tags(categorized_tags)
                 }
                 
-                metadata.append(meta)
-                print(f"  完成！艺术家: {len(categorized_tags['artist'])}, "
+                new_metadata.append(meta)
+                self.existing_ids.add(post['id'])  # 添加到已存在列表
+                
+                print(f"  📊 完成！艺术家: {len(categorized_tags['artist'])}, "
                       f"角色: {len(categorized_tags['character'])}, "
                       f"版权: {len(categorized_tags['copyright'])}, "
                       f"一般: {len(categorized_tags['general'])}")
@@ -196,9 +226,16 @@ class Rule34Scraper:
             # 避免请求过快
             time.sleep(1)
         
-        # 保存元数据
-        self.save_metadata(metadata)
-        return metadata
+        # 合并新旧元数据并保存
+        all_metadata = self.existing_metadata + new_metadata
+        self.save_metadata(all_metadata)
+        
+        print(f"\n📈 处理完成统计:")
+        print(f"  📥 新增: {len(new_metadata)} 个")
+        print(f"  ⏭️  跳过: {skipped_count} 个")
+        print(f"  📚 总计: {len(all_metadata)} 个")
+        
+        return new_metadata
     
     def determine_category(self, categorized_tags):
         """根据标签判断分类"""
@@ -238,7 +275,7 @@ class Rule34Scraper:
         """保存元数据到JSON文件"""
         with open(self.metadata_file, 'w', encoding='utf-8') as f:
             json.dump(metadata, f, ensure_ascii=False, indent=2)
-        print(f"\n元数据已保存到: {self.metadata_file}")
+        print(f"\n💾 元数据已保存到: {self.metadata_file}")
     
     def generate_upload_script(self, metadata):
         """生成批量上传脚本"""
@@ -274,7 +311,7 @@ async function batchUpload() {
         script_file = os.path.join(self.output_dir, "upload_script.js")
         with open(script_file, 'w', encoding='utf-8') as f:
             f.write(upload_script)
-        print(f"上传脚本已生成: {script_file}")
+        print(f"📜 上传脚本已生成: {script_file}")
 
 
 def main():
@@ -286,27 +323,29 @@ def main():
     limit = 10  # 每页数量
     page = 0    # 页码
     
-    print(f"开始爬取 Rule34...")
-    print(f"搜索标签: {search_tags}")
-    print(f"每页数量: {limit}")
+    print(f"🚀 开始爬取 Rule34...")
+    print(f"🔍 搜索标签: {search_tags}")
+    print(f"📄 每页数量: {limit}")
+    print(f"📚 已有数据: {len(scraper.existing_metadata)} 个")
     
     # 获取帖子
     posts = scraper.get_posts(search_tags, limit, page)
-    print(f"找到 {len(posts)} 个帖子")
+    print(f"🎯 找到 {len(posts)} 个帖子")
     
     if posts:
         # 处理帖子
-        metadata = scraper.process_posts(posts)
+        new_metadata = scraper.process_posts(posts)
         
         # 生成上传脚本
-        scraper.generate_upload_script(metadata)
+        if new_metadata:
+            scraper.generate_upload_script(new_metadata)
         
-        print("\n爬取完成！")
-        print(f"图片保存在: {scraper.output_dir}/images/")
-        print(f"元数据保存在: {scraper.metadata_file}")
-        print("\n下一步：")
+        print("\n🎉 爬取完成！")
+        print(f"📁 图片保存在: {scraper.output_dir}/images/")
+        print(f"📋 元数据保存在: {scraper.metadata_file}")
+        print("\n🔄 下一步：")
         print("1. 使用 metadata.json 中的信息")
-        print("2. 配合 upload-helper-advanced.html 批量上传")
+        print("2. 配合 batch-upload-tool.html 批量上传")
         print("3. 或使用生成的 upload_script.js")
 
 
