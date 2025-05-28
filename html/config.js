@@ -5,7 +5,7 @@ const SUPABASE_CONFIG = {
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliZWh0d2lxd29wZ2hnZWJsZmxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MDM1NzYsImV4cCI6MjA2Mzk3OTU3Nn0.yQaK5fo25uU_sDWAnMQilGAsoX4v4uY2eemt5SVg5tI',
     
     // 存储桶配置
-    bucketName: 'public',
+    bucketName: 'rule',
     
     // 应用配置
     itemsPerPage: 20,
