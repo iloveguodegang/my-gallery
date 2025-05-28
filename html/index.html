@@ -269,7 +269,7 @@
         /* 侧边栏过滤器 */
         .filters-sidebar {
             background: var(--bg-secondary);
-            padding: 1.5rem;
+            padding: 1rem;
             height: calc(100vh - 100px);
             overflow-y: auto;
             border-right: 1px solid var(--border-color);
@@ -277,13 +277,13 @@
         }
         
         .filter-section {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         
         .filter-title {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             color: var(--text-primary);
             display: flex;
             align-items: center;
@@ -293,21 +293,24 @@
         .hot-tags-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
         }
         
         .tag-item {
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 0.6rem 0.8rem;
+            padding: 0.5rem 0.75rem;
             border-radius: var(--border-radius);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             cursor: pointer;
             transition: var(--transition);
             text-align: left;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .tag-item:hover {
@@ -890,7 +893,7 @@
         <div class="container-fluid p-0">
             <div class="row g-0">
                 <!-- 侧边栏过滤器 -->
-                <div class="col-md-3">
+                <div class="col-md-3 col-lg-2">
                     <div class="filters-sidebar">
                         <!-- 热门标签 -->
                         <div class="filter-section">
@@ -935,7 +938,7 @@
                 </div>
 
                 <!-- 图片网格 -->
-                <div class="col-md-9">
+                <div class="col-md-9 col-lg-10">
                     <div class="gallery-container">
                         <div id="errorContainer"></div>
                         
@@ -1365,4 +1368,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
