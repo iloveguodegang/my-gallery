@@ -572,7 +572,7 @@
                     
                     // 上传到存储桶
                     const { data: uploadData, error: uploadError } = await supabase.storage
-                        .from('public')
+                        .from(SUPABASE_CONFIG.bucketName)
                         .upload(fileName, file);
                     
                     if (uploadError) throw uploadError;
@@ -589,7 +589,7 @@
                     const { error: dbError } = await supabase
                         .from('images')
                         .insert({
-                            file_path: `public/${fileName}`,
+                            file_path: `${SUPABASE_CONFIG.bucketName}/${fileName}`,
                             category: defaultCategory,
                             tags: finalTags
                         });
