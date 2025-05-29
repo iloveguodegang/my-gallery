@@ -1017,9 +1017,9 @@
                     .from('images')
                     .select('*');
                 
-                // 应用过滤器
+                // 修正：标签筛选
                 if (currentFilters.search) {
-                    query = query.textSearch('tags', currentFilters.search);
+                    query = query.contains('tags', [currentFilters.search]);
                 }
                 
                 if (currentFilters.rating) {
@@ -1085,14 +1085,14 @@
                 galleryItem.onclick = () => showImageDetails(image);
                 const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/rule/${image.file_path}`;
                 galleryItem.innerHTML = `
-                    <img src="${imageUrl}" alt="图片" loading="lazy">
+                    <img src="${imageUrl}" alt="图片" loading="lazy" onerror="this.parentElement.style.display='none';">
                     <div class="gallery-item-info">
                         <div class="text-muted small">
                             评分: ${image.score || 0} | 评级: ${image.rating || 'N/A'}
                         </div>
                         <div class="gallery-item-tags">
                             ${(image.tags || []).slice(0, 5).map(tag => 
-                                `<span class="gallery-item-tag">${tag}</span>`
+                                `<span class=\"gallery-item-tag\">${tag}</span>`
                             ).join('')}
                         </div>
                     </div>
