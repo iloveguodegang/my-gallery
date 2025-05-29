@@ -16,13 +16,28 @@
             color: #fafafa;
             min-height: 100vh;
             padding: 2rem 0;
+            font-family: 'Inter', sans-serif;
         }
         
+        body, .form-control, .form-select, .card-title, .form-label {
+            color: #fff !important;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .form-control, .form-select {
+            background-color: #232b2b !important;
+            border: 1.5px solid #4caf50 !important;
+        }
+        .form-label {
+            color: #b2ffb2 !important;
+            font-weight: 600;
+        }
         .card {
             background: rgba(26, 26, 26, 0.8);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(76, 175, 80, 0.3);
             border-radius: 15px;
+            box-shadow: 0 4px 24px rgba(76,175,80,0.12);
         }
         
         .btn-primary {
@@ -121,13 +136,6 @@
             border-radius: 10px;
             padding: 1rem;
             margin-bottom: 1rem;
-        }
-        
-        .form-control, .form-select {
-            background-color: rgba(26, 26, 26, 0.8);
-            border: 1px solid rgba(76, 175, 80, 0.3);
-            color: #fafafa;
-            border-radius: 8px;
         }
         
         .form-control:focus, .form-select:focus {
@@ -254,6 +262,17 @@
                                     自动跳过已上传的图片
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 存储桶配置 -->
+                <div class="config-section">
+                    <h6>存储桶配置</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="supabaseBucket" 
+                                   placeholder="存储桶名称" value="rule">
                         </div>
                     </div>
                 </div>
@@ -592,7 +611,7 @@
                 const filename = `${id}.${fileExt}`;
                 
                 // 上传到Supabase存储
-                const filePath = `rule/${filename}`;
+                const filePath = filename;
                 const { error: uploadError } = await supabase.storage
                     .from('rule')
                     .upload(filePath, imageBlob, {
@@ -719,7 +738,9 @@
         // 下载图片
         async function downloadImage(url) {
             try {
-                const response = await fetch(url);
+                // 通过本地Python代理下载图片，解决CORS问题
+                const proxyUrl = `http://localhost:5000/fetch_image?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl);
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
