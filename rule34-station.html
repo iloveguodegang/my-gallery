@@ -610,10 +610,10 @@
                 const fileExt = fileUrl.split('.').pop().split('?')[0] || 'jpg';
                 const filename = `${id}.${fileExt}`;
                 
-                // 上传到Supabase存储
+                // 上传到Supabase存储（只用文件名，不带任何目录）
                 const filePath = filename;
                 const { error: uploadError } = await supabase.storage
-                    .from('rule')
+                    .from(document.getElementById('supabaseBucket').value)
                     .upload(filePath, imageBlob, {
                         contentType: `image/${fileExt}`,
                         upsert: false
@@ -644,7 +644,7 @@
                 
                 if (dbError) {
                     // 如果数据库插入失败，删除已上传的文件
-                    await supabase.storage.from('rule').remove([filePath]);
+                    await supabase.storage.from(document.getElementById('supabaseBucket').value).remove([filePath]);
                     throw new Error(`数据库保存失败: ${dbError.message}`);
                 }
                 
