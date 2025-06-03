@@ -332,25 +332,24 @@
         }
         
         .gallery-item {
+            position: relative;
+            overflow: hidden;
             break-inside: avoid;
             margin-bottom: 1rem;
-            position: relative;
             border-radius: var(--border-radius);
-            overflow: hidden;
-            cursor: pointer;
-            transition: var(--transition);
+            background: var(--bg-secondary);
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-4px);
         }
         
         .gallery-item img {
             width: 100%;
             height: auto;
             display: block;
-            transition: var(--transition);
-        }
-        
-        .gallery-item:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-heavy);
+            transition: transform 0.3s ease;
         }
         
         .gallery-item:hover img {
@@ -412,18 +411,19 @@
         }
         
         .modal-image {
-            flex: 2;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 200px;
             background: #000;
-            position: relative;
         }
         
         .modal-image img {
             max-width: 100%;
-            max-height: 100%;
+            max-height: 70vh;
             object-fit: contain;
+            transition: opacity 0.3s ease;
         }
         
         .modal-info {
@@ -609,7 +609,8 @@
             width: 100%;
             height: 100px;
             object-fit: cover;
-            transition: transform 0.3s;
+            border-radius: 4px;
+            transition: transform 0.3s ease;
         }
         
         .recommended-image:hover img {
@@ -748,12 +749,6 @@
                     <div class="gallery" id="gallery">
                         <!-- 图片将动态加载 -->
                     </div>
-                    <div class="text-center mt-4">
-                        <button class="btn btn-outline-success btn-lg" id="loadMoreBtn" onclick="loadMoreImages()">
-                            <i class="bi bi-arrow-down-circle"></i>
-                            加载更多
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -848,20 +843,27 @@
             loadHotTags();
             loadImages();
             
-            // 搜索框回车事件
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-            
-            // 滚动时导航栏效果
+            // 添加滚动监听
             window.addEventListener('scroll', function() {
                 const navbar = document.getElementById('navbar');
                 if (window.scrollY > 50) {
                     navbar.classList.add('scrolled');
                 } else {
                     navbar.classList.remove('scrolled');
+                }
+                
+                // 无限滚动加载
+                if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 1000) {
+                    if (!isLoading && hasMoreImages) {
+                        loadImages();
+                    }
+                }
+            });
+            
+            // 搜索框回车事件
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
                 }
             });
             
@@ -876,30 +878,22 @@
         // 加载热门标签
         async function loadHotTags() {
             try {
-                const { data, error } = await supabase
-                    .from('images')
-                    .select('tags');
+                // 获取所有图片的标签并统计数量
+                const { data: tagCounts, error: countError } = await supabase
+                    .rpc('count_tags_by_group');
                 
-                if (error) throw error;
+                if (countError) throw countError;
                 
-                // 统计标签频率
-                const tagCounts = {};
-                data.forEach(image => {
-                    if (image.tags && Array.isArray(image.tags)) {
-                        image.tags.forEach(tag => {
-                            tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-                        });
-                    }
+                // 转换数据格式
+                hotTags = [];
+                Object.entries(tagCounts).forEach(([tag, count]) => {
+                    hotTags.push([tag, count]);
                 });
                 
-                // 排序并获取热门标签
-                const sortedTags = Object.entries(tagCounts)
-                    .sort(([,a], [,b]) => b - a)
-                    .slice(0, 50); // 取前50个热门标签
+                // 按数量排序
+                hotTags.sort((a, b) => b[1] - a[1]);
                 
-                hotTags = sortedTags;
                 renderHotTags();
-                
             } catch (error) {
                 console.error('加载热门标签失败:', error);
             }
@@ -918,6 +912,7 @@
                 else if (tag.startsWith('meta:')) groups.meta.push([tag.replace('meta:', ''), count]);
                 else groups.general.push([tag, count]);
             });
+            
             const groupNames = [
                 { key: 'copyright', label: '版权' },
                 { key: 'character', label: '角色' },
@@ -925,46 +920,42 @@
                 { key: 'general', label: '通用' },
                 { key: 'meta', label: '元标签' }
             ];
+            
             groupNames.forEach(group => {
                 if (groups[group.key].length > 0) {
                     const groupDiv = document.createElement('div');
                     groupDiv.style.marginBottom = '0.5rem';
-                    // 展开状态
                     let expanded = false;
-                    // 展开数量
                     const defaultCount = group.key === 'general' ? 10 : 3;
-                    // 标签容器
                     const tagsWrap = document.createElement('div');
                     tagsWrap.className = 'tags-wrap';
-                    // 渲染标签函数
+                    
                     function renderTags() {
                         tagsWrap.innerHTML = '';
                         const showCount = expanded ? groups[group.key].length : defaultCount;
                         groups[group.key].slice(0, showCount).forEach(([tag, count]) => {
-                            const tagElement = document.createElement('div');
-                            tagElement.className = 'tag-item';
-                            tagElement.textContent = tag;
-                            tagElement.onclick = () => filterByTag(tag);
-                            const countSpan = document.createElement('span');
-                            countSpan.className = 'tag-count';
-                            countSpan.textContent = count;
-                            tagElement.appendChild(countSpan);
+                            const tagElement = document.createElement('button');
+                            tagElement.className = 'btn btn-sm btn-outline-success me-1 mb-1';
+                            tagElement.textContent = `${tag} (${count})`;
+                            tagElement.onclick = () => {
+                                filterByTag(group.key === 'general' ? tag : `${group.key}:${tag}`);
+                            };
                             tagsWrap.appendChild(tagElement);
                         });
                     }
-                    // 通用分组展开按钮放在标题右侧
+                    
                     if (group.key === 'general' && groups.general.length > defaultCount) {
                         const titleDiv = document.createElement('div');
                         titleDiv.style.display = 'flex';
                         titleDiv.style.alignItems = 'center';
+                        titleDiv.style.marginBottom = '0.5rem';
                         const strong = document.createElement('strong');
                         strong.style.color = '#4caf50';
                         strong.textContent = group.label + '：';
                         titleDiv.appendChild(strong);
                         const toggleBtn = document.createElement('button');
-                        toggleBtn.className = 'btn btn-link btn-sm p-0';
+                        toggleBtn.className = 'btn btn-link btn-sm p-0 ms-2';
                         toggleBtn.style.color = '#81c784';
-                        toggleBtn.style.marginLeft = '8px';
                         toggleBtn.textContent = expanded ? '收起' : '展开更多';
                         toggleBtn.onclick = () => {
                             expanded = !expanded;
@@ -974,15 +965,23 @@
                         titleDiv.appendChild(toggleBtn);
                         groupDiv.appendChild(titleDiv);
                     } else {
-                        groupDiv.innerHTML = `<strong style=\"color:#4caf50;\">${group.label}：</strong>`;
+                        const titleStrong = document.createElement('strong');
+                        titleStrong.style.color = '#4caf50';
+                        titleStrong.style.display = 'block';
+                        titleStrong.style.marginBottom = '0.5rem';
+                        titleStrong.textContent = group.label + '：';
+                        groupDiv.appendChild(titleStrong);
                     }
+                    
                     renderTags();
                     groupDiv.appendChild(tagsWrap);
-                    // 其它分组展开按钮在下方
+                    
                     if (group.key !== 'general' && groups[group.key].length > defaultCount) {
                         const toggleBtn = document.createElement('button');
                         toggleBtn.className = 'btn btn-link btn-sm p-0';
                         toggleBtn.style.color = '#81c784';
+                        toggleBtn.style.display = 'block';
+                        toggleBtn.style.marginTop = '0.5rem';
                         toggleBtn.textContent = expanded ? '收起' : '展开更多';
                         toggleBtn.onclick = () => {
                             expanded = !expanded;
@@ -991,6 +990,7 @@
                         };
                         groupDiv.appendChild(toggleBtn);
                     }
+                    
                     container.appendChild(groupDiv);
                 }
             });
@@ -1017,13 +1017,10 @@
                     .from('images')
                     .select('*');
                 
-                // 修正：标签筛选
+                // 标签筛选
                 if (currentFilters.search) {
-                    query = query.contains('tags', [currentFilters.search]);
-                }
-                
-                if (currentFilters.rating) {
-                    query = query.eq('rating', currentFilters.rating);
+                    const searchTerm = currentFilters.search.toLowerCase();
+                    query = query.filter('tags', 'cs', `{${searchTerm}}`);
                 }
                 
                 // 排序
@@ -1053,9 +1050,6 @@
                 
                 if (data.length < pageSize) {
                     hasMoreImages = false;
-                    document.getElementById('loadMoreBtn').style.display = 'none';
-                } else {
-                    document.getElementById('loadMoreBtn').style.display = 'block';
                 }
                 
                 if (reset) {
@@ -1083,16 +1077,23 @@
                 const galleryItem = document.createElement('div');
                 galleryItem.className = 'gallery-item';
                 galleryItem.onclick = () => showImageDetails(image);
-                const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/rule/${image.file_path}`;
+                
+                // 使用缩略图URL
+                const thumbnailUrl = getThumbnailUrl(getOriginalUrl(image.file_path));
+                
                 galleryItem.innerHTML = `
-                    <img src="${imageUrl}" alt="图片" loading="lazy" onerror="this.parentElement.style.display='none';">
+                    <img src="${thumbnailUrl}" 
+                         alt="缩略图" 
+                         loading="lazy" 
+                         data-original="${getOriginalUrl(image.file_path)}"
+                         onerror="this.parentElement.style.display='none';">
                     <div class="gallery-item-info">
                         <div class="text-muted small">
                             评分: ${image.score || 0} | 评级: ${image.rating || 'N/A'}
                         </div>
                         <div class="gallery-item-tags">
                             ${(image.tags || []).slice(0, 5).map(tag => 
-                                `<span class=\"gallery-item-tag\">${tag}</span>`
+                                `<span class="gallery-item-tag">${tag}</span>`
                             ).join('')}
                         </div>
                     </div>
@@ -1104,13 +1105,25 @@
         // 显示图片详情
         function showImageDetails(image) {
             const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-            const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/rule/${image.file_path}`;
-            document.getElementById('modalImage').src = imageUrl;
+            const modalImage = document.getElementById('modalImage');
+            const originalUrl = getOriginalUrl(image.file_path);
+            
+            // 先显示缩略图
+            modalImage.src = getThumbnailUrl(originalUrl);
+            
+            // 预加载原图
+            const originalImg = new Image();
+            originalImg.onload = function() {
+                modalImage.src = originalUrl;
+            };
+            originalImg.src = originalUrl;
+            
             document.getElementById('imageInfo').innerHTML = `
                 <div>上传时间：${new Date(image.uploaded_at).toLocaleString()}</div>
                 <div>尺寸：${image.width || '未知'} × ${image.height || '未知'}</div>
                 <div>评分：${image.score || 0}</div>
             `;
+            
             const tagsContainer = document.getElementById('modalTagsContainer');
             tagsContainer.innerHTML = '';
             const groups = { copyright: [], character: [], artist: [], general: [], meta: [] };
@@ -1123,6 +1136,7 @@
                     else groups.general.push(tag);
                 });
             }
+            
             const groupNames = [
                 { key: 'copyright', label: '版权' },
                 { key: 'character', label: '角色' },
@@ -1130,6 +1144,7 @@
                 { key: 'general', label: '通用' },
                 { key: 'meta', label: '元标签' }
             ];
+            
             groupNames.forEach(group => {
                 if (groups[group.key].length > 0) {
                     const groupDiv = document.createElement('div');
@@ -1149,8 +1164,10 @@
                     tagsContainer.appendChild(groupDiv);
                 }
             });
+            
             // 浏览量+1
             supabase.from('images').update({ views: (image.views || 0) + 1 }).eq('id', image.id);
+            
             // 加载推荐图片
             loadRecommendedImages(image.tags, image.id);
             modal.show();
@@ -1172,10 +1189,10 @@
                     .limit(6);
                 if (error) throw error;
                 data.forEach(img => {
-                    const imgUrl = `${SUPABASE_URL}/storage/v1/object/public/rule/${img.file_path}`;
+                    const thumbnailUrl = getThumbnailUrl(getOriginalUrl(img.file_path));
                     const div = document.createElement('div');
                     div.className = 'recommended-image';
-                    div.innerHTML = `<img src="${imgUrl}" alt="推荐图片">`;
+                    div.innerHTML = `<img src="${thumbnailUrl}" alt="推荐图片">`;
                     div.onclick = () => showImageDetails(img);
                     container.appendChild(div);
                 });
@@ -1193,10 +1210,25 @@
         }
         
         // 按标签过滤
-        function filterByTag(tag) {
-            document.getElementById('searchInput').value = tag;
+        async function filterByTag(tag) {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.value = tag;
             currentFilters.search = tag;
-            updateCurrentFiltersDisplay();
+            
+            // 获取该标签的图片总数
+            try {
+                const { count, error } = await supabase
+                    .from('images')
+                    .select('*', { count: 'exact' })
+                    .filter('tags', 'cs', `{${tag}}`);
+                
+                if (error) throw error;
+                
+                console.log(`标签 "${tag}" 下共有 ${count} 张图片`);
+            } catch (error) {
+                console.error('获取标签图片数量失败:', error);
+            }
+            
             loadImages(true);
         }
         
@@ -1210,10 +1242,11 @@
         
         // 应用过滤器
         function applyFilters() {
-            currentFilters.sortBy = document.getElementById('sortBy').value;
-            currentFilters.rating = document.getElementById('ratingFilter').value;
-            updateCurrentFiltersDisplay();
-            loadImages(true);
+            const sortBy = document.getElementById('sortBy').value;
+            if (currentFilters.sortBy !== sortBy) {
+                currentFilters.sortBy = sortBy;
+                loadImages(true);
+            }
         }
         
         // 清除过滤器
@@ -1302,6 +1335,21 @@
             link.href = imageUrl;
             link.download = 'image.jpg';
             link.click();
+        }
+        
+        // 添加缩略图工具函数
+        function getThumbnailUrl(originalUrl) {
+            const url = new URL(originalUrl);
+            const pathParts = url.pathname.split('/');
+            const filename = pathParts.pop();
+            // 在文件名前添加 thumb_ 前缀
+            pathParts.push('thumbnails', filename);
+            url.pathname = pathParts.join('/');
+            return url.toString();
+        }
+        
+        function getOriginalUrl(imagePath) {
+            return `${SUPABASE_URL}/storage/v1/object/public/rule/${imagePath}`;
         }
     </script>
 </body>
